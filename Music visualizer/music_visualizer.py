@@ -1,12 +1,16 @@
+# multiline comments Crtl + K + C (undo + U)
+
 import arcade
+from arcade.application import Window
 import librosa
 import librosa.display
 import numpy as np
+import sys
 
 # Constants
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 650
-SCREEN_TITLE = "Music visualizer"
+SCREEN_TITLE = "music visualizer"
 CENTER_X = SCREEN_WIDTH/2
 CENTER_Y = SCREEN_HEIGHT/2
 
@@ -39,12 +43,18 @@ class visualizer(arcade.Window):
         pass
 
     def on_key_press(self, key, modifiers):
+
+        # pause and resume
         if key == arcade.key.SPACE:
-            if self.pause:
-                self.song.play(loop=True)
+            if not self.pause:
+                self.player.pause()
             else:
-                self.song.stop(self.player)
+                self.player.play()
             self.pause = not self.pause
+
+        # close
+        if key == arcade.key.ESCAPE:
+            arcade.close_window()
 
     def on_update(self, delta_time: float):
         if not self.pause:
