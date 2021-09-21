@@ -6,12 +6,6 @@ import librosa.display
 import numpy as np
 from scipy.signal import savgol_filter, resample
 
-# Constants
-SCREEN_WIDTH = 1200
-SCREEN_HEIGHT = 800
-SCREEN_TITLE = "music visualizer"
-CENTER_X = SCREEN_WIDTH/2
-CENTER_Y = SCREEN_HEIGHT/2
 
 # options
 RECTANGLE = "rect"
@@ -20,7 +14,17 @@ CIRCLE_OUTLINE = "circle_outline"
 LINE = "line"
 POINT_GRAPH = "point_graph"
 LINE_GRAPH = "line_graph"
+KLEIN_BOTTLE = "klein_bottle"
 
+# Constants
+DEFAULT_WIDTH = 1100
+DEFAULT_HEIGHT = 700
+SCREEN_TITLE = "music visualizer"
+
+# pictures
+KLEIN_BOTTLE_SPRITE = arcade.Sprite("media/Klein_bottle.png", scale=1, center_x=DEFAULT_WIDTH/2, center_y=DEFAULT_HEIGHT/2)
+
+# sound
 SONG = "source/INDUSTRY_BABY_feat_Jack_Harlow.wav"  # put your song here
 AUDIO_TIME_SERIES, SAMPLING_RATE = librosa.load(SONG)
 
@@ -29,9 +33,13 @@ FPS = 75  # (refresh rate of the visualizer)
 
 class Visualizer(arcade.Window):
     def __init__(self, default):
-        super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, update_rate=1/FPS)
+        super().__init__(DEFAULT_WIDTH, DEFAULT_HEIGHT, SCREEN_TITLE, update_rate=1/FPS, resizable=True)
         arcade.set_background_color(arcade.csscolor.WHITE)
         self.color = arcade.csscolor.LIME
+
+        # window
+        self.CENTER_X = DEFAULT_WIDTH/2
+        self.CENTER_Y = DEFAULT_HEIGHT/2
 
         # sound stuff
         self.song = arcade.Sound(SONG)
@@ -48,6 +56,14 @@ class Visualizer(arcade.Window):
 
     def setup(self):
         self.smooth = savgol_filter(abs(AUDIO_TIME_SERIES), window_length=2001, polyorder=3)
+
+    def on_resize(self, width, height):
+        super().on_resize(width, height)
+        self.SCREEN_WIDTH = width
+        self.SCREEN_HEIGHT = height
+        self.CENTER_X = self.SCREEN_WIDTH/2
+        self.CENTER_Y = self.SCREEN_HEIGHT/2
+        print(f"Window resized to: {width}, {height}")
 
     def on_key_press(self, key, modifiers):
         # pause and resume
@@ -73,9 +89,13 @@ class Visualizer(arcade.Window):
         elif key == arcade.key.L:
             self.option = LINE
         elif key == arcade.key.P:
+            self.points.clear()
             self.option = POINT_GRAPH
         elif key == arcade.key.G:
+            self.points.clear()
             self.option = LINE_GRAPH
+        elif key == arcade.key.K:
+            self.option = KLEIN_BOTTLE
 
     #
     def on_update(self, delta_time):
@@ -84,7 +104,7 @@ class Visualizer(arcade.Window):
 
             if self.option in (POINT_GRAPH, LINE_GRAPH):
                 self.update_points(self.smooth * 2)
-            elif self.option in (RECTANGLE, CIRCLE, CIRCLE_OUTLINE, LINE):
+            elif self.option in (RECTANGLE, CIRCLE, CIRCLE_OUTLINE, LINE, KLEIN_BOTTLE):
                 self.update_single_value(self.smooth * 2)
 
     def on_draw(self):
@@ -102,12 +122,14 @@ class Visualizer(arcade.Window):
             self.draw_graph_points()
         elif self.option == LINE_GRAPH:
             self.draw_graph_line_strip()
+        elif self.option == KLEIN_BOTTLE:
+            self.draw_klein_bottle()
 
         arcade.finish_render()  # ---
 
     # update functions
     def update_points(self, audio_signal):
-        self.points.append([SCREEN_WIDTH, CENTER_Y - CENTER_Y/2 + audio_signal[self.part] * CENTER_Y])
+        self.points.append([self.SCREEN_WIDTH, self.CENTER_Y - self.CENTER_Y/2 + audio_signal[self.part] * self.CENTER_Y])
 
         self.points = np.array(self.points)
         self.points[:, 0] = self.points[:, 0] - 2  # shift all the points to the left
@@ -127,19 +149,23 @@ class Visualizer(arcade.Window):
         arcade.draw_points(self.points, color=self.color, size=3)
 
     def draw_rect(self):
-        arcade.draw_rectangle_filled(CENTER_X, CENTER_Y, 800 * self.value, 200, color=self.color)
+        arcade.draw_rectangle_filled(self.CENTER_X, self.CENTER_Y, 800 * self.value, 200, color=self.color)
 
     def draw_line(self):
-        arcade.draw_line(CENTER_X, CENTER_Y, CENTER_X + 400 * self.value, CENTER_Y, line_width=8, color=self.color)
-        arcade.draw_line(CENTER_X, CENTER_Y, CENTER_X - 400 * self.value, CENTER_Y, line_width=8, color=self.color)
+        arcade.draw_line(self.CENTER_X, self.CENTER_Y, self.CENTER_X + 400 * self.value, self.CENTER_Y, line_width=8, color=self.color)
+        arcade.draw_line(self.CENTER_X, self.CENTER_Y, self.CENTER_X - 400 * self.value, self.CENTER_Y, line_width=8, color=self.color)
 
     def draw_circle_outline(self):
-        arcade.draw_circle_outline(CENTER_X, CENTER_Y, 250 * self.value, color=self.color, border_width=5)
+        arcade.draw_circle_outline(self.CENTER_X, self.CENTER_Y, 250 * self.value, color=self.color, border_width=5)
 
     def draw_circle(self):
-        arcade.draw_circle_filled(CENTER_X, CENTER_Y, 250 * self.value, color=self.color)
+        arcade.draw_circle_filled(self.CENTER_X, self.CENTER_Y, 250 * self.value, color=self.color)
 
-    # sound
+    def draw_klein_bottle(self):
+        KLEIN_BOTTLE_SPRITE.scale = self.value * 2
+        KLEIN_BOTTLE_SPRITE.draw()
+        # sound
+
     def play_song(self):
         self.player = self.song.play(loop=True)
 

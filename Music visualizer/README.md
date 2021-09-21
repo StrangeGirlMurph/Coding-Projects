@@ -26,3 +26,4 @@ Press these letters to change the visualizer on the flow
 - ``l`` for LINE
 - ``p`` for POINT_GRAPH (actually this one is kinda broke but I don't wanna fix it)
 - ``g`` for LINE_GRAPH
+- ``k`` for KLEIN_BOTTLE
