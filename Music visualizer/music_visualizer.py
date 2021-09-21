@@ -1,11 +1,9 @@
 # multiline comments Crtl + K + C (undo + U)
 
 import arcade
-from arcade.application import Window
 import librosa
 import librosa.display
 import numpy as np
-import sys
 
 # Constants
 SCREEN_WIDTH = 1000
@@ -18,10 +16,10 @@ SONG = "source/INDUSTRY_BABY_feat_Jack_Harlow.wav"  # put your song here
 AUDIO_TIME_SERIES, SAMPLING_RATE = librosa.load(SONG)
 
 # sampling rate for new data for industry baby is 40 fps
-FPS = 40
+FPS = 30
 
 
-class visualizer(arcade.Window):
+class Visualizer(arcade.Window):
     def __init__(self):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, update_rate=1/FPS)
         arcade.set_background_color(arcade.csscolor.WHITE)
@@ -55,22 +53,23 @@ class visualizer(arcade.Window):
         # close
         if key == arcade.key.ESCAPE:
             arcade.close_window()
+            # arcade.exit()
 
-    def on_update(self, delta_time: float):
+    def on_update(self, delta_time):
         if not self.pause:
             self.part = int(self.song.get_stream_position(self.player) * SAMPLING_RATE)
 
-            self.update_points()
-            # self.update_single_value()  # for the circle, line and rect
+            # self.update_points()
+            self.update_single_value()  # for the circle, line and rect
 
     def on_draw(self):
         arcade.start_render()  # ---
 
-        self.draw_graph_line_strip()
+        # self.draw_graph_line_strip()
         # self.draw_graph_points()
         # self.draw_circle()
         # self.draw_line()
-        # self.draw_rect()
+        self.draw_rect()
 
         arcade.finish_render()  # ---
 
@@ -94,7 +93,7 @@ class visualizer(arcade.Window):
         arcade.draw_points(self.points, color=self.color, size=3)
 
     def draw_rect(self):
-        arcade.draw_rectangle_filled(CENTER_X, CENTER_Y, 800 * self.value, 100, color=self.color)
+        arcade.draw_rectangle_filled(CENTER_X, CENTER_Y, 800 * self.value, 200, color=self.color)
 
     def draw_line(self):
         arcade.draw_line(CENTER_X, CENTER_Y, CENTER_X + 400 * self.value, CENTER_Y, line_width=8, color=self.color)
@@ -103,12 +102,15 @@ class visualizer(arcade.Window):
     def draw_circle(self):
         arcade.draw_circle_outline(CENTER_X, CENTER_Y, 250 * self.value, color=self.color, border_width=5)
 
+    def play_song(self):
+        self.player = self.song.play(loop=True)
+
 
 def main():
-    window = visualizer()
-    window.setup()
+    music_visualizer = Visualizer()
+    music_visualizer.setup()
 
-    window.player = window.song.play(loop=True)
+    music_visualizer.play_song()
     arcade.run()
 
 
