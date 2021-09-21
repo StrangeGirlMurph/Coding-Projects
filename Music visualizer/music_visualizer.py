@@ -1,7 +1,6 @@
 # multiline comments Crtl + K + C (undo + U)
 
 import arcade
-from arcade.gl.enums import LINE_STRIP
 import librosa
 import librosa.display
 import numpy as np
