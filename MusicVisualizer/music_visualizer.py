@@ -130,6 +130,7 @@ class Visualizer(arcade.Window):
             return
         print(f'Choosen visualizer: {self.option}')
 
+    # updating and drawing
     def on_update(self, delta_time):
         if not self.pause:
             self.part = int(self.song.get_stream_position(self.player) * self.SAMPLING_RATE)
