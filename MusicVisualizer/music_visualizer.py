@@ -115,10 +115,10 @@ class Visualizer(arcade.Window):
         elif key == arcade.key.L:
             self.option = LINE
         elif key == arcade.key.P:
-            self.self.points.clear()
+            self.points.clear()
             self.option = POINT_GRAPH
         elif key == arcade.key.G:
-            self.self.points.clear()
+            self.points.clear()
             self.option = LINE_GRAPH
         elif key == arcade.key.K:
             self.option = KLEIN_BOTTLE
@@ -176,12 +176,12 @@ class Visualizer(arcade.Window):
     def update_points(self, audio_signal):
         self.points.append([self.SCREEN_WIDTH, self.CENTER_Y - self.CENTER_Y/2 + audio_signal[self.part] * self.CENTER_Y])
 
-        self.points = np.array(self.self.points)
-        self.points[:, 0] = self.self.points[:, 0] - 2  # shift all the self.points to the left
+        self.points = np.array(self.points)
+        self.points[:, 0] = self.points[:, 0] - 2  # shift all the self.points to the left
 
         # delete all the self.points that are outside of the window
-        self.points = np.delete(self.self.points, np.where(self.self.points[:, 0] < 0), axis=0)
-        self.points = self.self.points.tolist()
+        self.points = np.delete(self.points, np.where(self.points[:, 0] < 0), axis=0)
+        self.points = self.points.tolist()
 
     def update_single_value(self, audio_signal):
         self.value = abs(audio_signal[self.part])
