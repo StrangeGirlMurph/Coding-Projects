@@ -5,7 +5,7 @@ import librosa
 import librosa.display
 import numpy as np
 from scipy.signal import savgol_filter, resample
-
+import math
 
 # options
 RECTANGLE = "rect"
@@ -16,6 +16,7 @@ POINT_GRAPH = "point_graph"
 LINE_GRAPH = "line_graph"
 KLEIN_BOTTLE = "klein_bottle"
 CHANGING_SHAPES = "changing_shapes"
+TESSERACT = "tesseract"
 
 # Constants
 DEFAULT_WIDTH = 1100
@@ -31,7 +32,7 @@ AUDIO_TIME_SERIES, SAMPLING_RATE = librosa.load(SONG)
 TEMPO, BEAT_FRAMES = librosa.beat.beat_track(y=AUDIO_TIME_SERIES, sr=SAMPLING_RATE)
 # BEATS = librosa.frames_to_time(BEAT_FRAMES, sr=SAMPLING_RATE)
 
-FPS = 75  # (refresh rate of the visualizer)
+FPS = 60  # (refresh rate of the visualizer)
 
 # how to add a new visualizer:
 # 1. create a constant for it under options
@@ -48,8 +49,8 @@ class Visualizer(arcade.Window):
         self.color = arcade.csscolor.LIME
 
         # window
-        self.CENTER_X = DEFAULT_WIDTH/2
-        self.CENTER_Y = DEFAULT_HEIGHT/2
+        self.CENTER_X = DEFAULT_WIDTH//2
+        self.CENTER_Y = DEFAULT_HEIGHT//2
 
         # sound stuff
         self.song = arcade.Sound(SONG)
@@ -57,25 +58,28 @@ class Visualizer(arcade.Window):
 
         # logic stuff
         self.frameNumber = 0
+        self.numberOfLastDrawnFrame = 0
         self.cycle = 0  # for changing shapes
         self.part = 0  # part of the audio time series that the song is currently at
         self.pause = False
         self.option = default
 
         self.value = 0  # the value at this part
-        self.points = []  # points for the line strip graph or the point graph
+        self.points = []  # self.points for the line strip graph or the point graph
 
     def setup(self):
         self.smooth = savgol_filter(abs(AUDIO_TIME_SERIES), window_length=2001, polyorder=3) * 2
+        self.tesseract = Tesseract()
 
     def on_resize(self, width, height):
         super().on_resize(width, height)
         self.SCREEN_WIDTH = width
         self.SCREEN_HEIGHT = height
-        self.CENTER_X = self.SCREEN_WIDTH/2
-        self.CENTER_Y = self.SCREEN_HEIGHT/2
+        self.CENTER_X = self.SCREEN_WIDTH//2
+        self.CENTER_Y = self.SCREEN_HEIGHT//2
         print(f"Window resized to: {width}, {height}")
 
+    # handle keyboard input
     def on_key_press(self, key, modifiers):
         # pause and resume
         if key == arcade.key.SPACE:
@@ -101,15 +105,17 @@ class Visualizer(arcade.Window):
         elif key == arcade.key.L:
             self.option = LINE
         elif key == arcade.key.P:
-            self.points.clear()
+            self.self.points.clear()
             self.option = POINT_GRAPH
         elif key == arcade.key.G:
-            self.points.clear()
+            self.self.points.clear()
             self.option = LINE_GRAPH
         elif key == arcade.key.K:
             self.option = KLEIN_BOTTLE
         elif key == arcade.key.S:
             self.option = CHANGING_SHAPES
+        elif key == arcade.key.T:
+            self.option = TESSERACT
         else:
             return
         print(f'Choosen visualizer: {self.option}')
@@ -122,41 +128,52 @@ class Visualizer(arcade.Window):
                 self.update_points(self.smooth)
             elif self.option in (RECTANGLE, CIRCLE, CIRCLE_OUTLINE, LINE, KLEIN_BOTTLE, CHANGING_SHAPES):
                 self.update_single_value(self.smooth)
-
+            elif self.option == TESSERACT:
+                self.update_single_value(self.smooth)
+                if self.value < 0.4:
+                    self.tesseract.scale = (self.value + 0.2) * self.tesseract.default_scale
+                    self.tesseract.angle += self.tesseract.speed/2
+                else:
+                    self.tesseract.angle += self.tesseract.speed * self.value
+                    self.tesseract.scale = self.value * self.tesseract.default_scale
             self.frameNumber += 1
 
     def on_draw(self):
-        arcade.start_render()  # ---
+        if self.frameNumber > self.numberOfLastDrawnFrame:
+            arcade.start_render()  # ---
 
-        if self.option == RECTANGLE:
-            self.draw_rect()
-        elif self.option == CIRCLE:
-            self.draw_circle()
-        elif self.option == CIRCLE_OUTLINE:
-            self.draw_circle_outline()
-        elif self.option == LINE:
-            self.draw_line()
-        elif self.option == POINT_GRAPH:
-            self.draw_graph_points()
-        elif self.option == LINE_GRAPH:
-            self.draw_graph_line_strip()
-        elif self.option == KLEIN_BOTTLE:
-            self.draw_klein_bottle()
-        elif self.option == CHANGING_SHAPES:
-            self.draw_changing_shapes()
+            if self.option == RECTANGLE:
+                self.draw_rect()
+            elif self.option == CIRCLE:
+                self.draw_circle()
+            elif self.option == CIRCLE_OUTLINE:
+                self.draw_circle_outline()
+            elif self.option == LINE:
+                self.draw_line()
+            elif self.option == POINT_GRAPH:
+                self.draw_graph_points()
+            elif self.option == LINE_GRAPH:
+                self.draw_graph_line_strip()
+            elif self.option == KLEIN_BOTTLE:
+                self.draw_klein_bottle()
+            elif self.option == CHANGING_SHAPES:
+                self.draw_changing_shapes()
+            elif self.option == TESSERACT:
+                self.draw_tesseract()
 
-        arcade.finish_render()  # ---
+            arcade.finish_render()  # ---
+            self.numberOfLastDrawnFrame = self.frameNumber
 
     # update functions
     def update_points(self, audio_signal):
         self.points.append([self.SCREEN_WIDTH, self.CENTER_Y - self.CENTER_Y/2 + audio_signal[self.part] * self.CENTER_Y])
 
-        self.points = np.array(self.points)
-        self.points[:, 0] = self.points[:, 0] - 2  # shift all the points to the left
+        self.points = np.array(self.self.points)
+        self.points[:, 0] = self.self.points[:, 0] - 2  # shift all the self.points to the left
 
-        # delete all the points that are outside of the window
-        self.points = np.delete(self.points, np.where(self.points[:, 0] < 0), axis=0)
-        self.points = self.points.tolist()
+        # delete all the self.points that are outside of the window
+        self.points = np.delete(self.self.points, np.where(self.self.points[:, 0] < 0), axis=0)
+        self.points = self.self.points.tolist()
 
     def update_single_value(self, audio_signal):
         self.value = abs(audio_signal[self.part])
@@ -207,17 +224,185 @@ class Visualizer(arcade.Window):
         elif self.cycle == 2:
             self.draw_line()
 
+    def draw_tesseract(self):
+        index = 0
+        projected_points = [j for j in range(len(self.tesseract.points))]
+
+        for point in self.tesseract.points:
+            rotated_3d = self.tesseract.rotation4d_xy(point)
+            rotated_3d = self.tesseract.rotation4d_zw(rotated_3d)
+
+            distance = 5
+            w = 1/(distance - rotated_3d[3][0])
+            projection_matrix4 = [
+                [w, 0, 0, 0],
+                [0, w, 0, 0],
+                [0, 0, w, 0], ]
+
+            projected_3d = self.tesseract.matrix_multiplication(projection_matrix4, rotated_3d)
+            rotated_2d = self.tesseract.tesseract_rotation(projected_3d)
+
+            z = 1/(distance - (rotated_2d[2][0] + rotated_3d[3][0]))
+            projection_matrix = [[z, 0, 0],
+                                 [0, z, 0]
+                                 ]
+
+            rotated_2d = self.tesseract.rotation_x(projected_3d)
+            projected_2d = self.tesseract.matrix_multiplication(projection_matrix, rotated_2d)
+            x = int(projected_2d[0][0] * self.tesseract.scale) + self.CENTER_X
+            y = int(projected_2d[1][0] * self.tesseract.scale) + self.CENTER_Y
+
+            projected_points[index] = [x, y]
+            arcade.draw_circle_filled(x, y, color=arcade.csscolor.LIME, radius=4)
+            index += 1
+
+        # draw edges
+        for m in range(4):
+            self.connect_points(m, (m+1) % 4, projected_points, 8)
+            self.connect_points(m+4, (m+1) % 4 + 4, projected_points, 8)
+            self.connect_points(m, m+4, projected_points, 8)
+
+        for m in range(4):
+            self.connect_points(m, (m+1) % 4, projected_points, 0)
+            self.connect_points(m+4, (m+1) % 4 + 4, projected_points, 0)
+            self.connect_points(m, m+4, projected_points, 0)
+
+        for m in range(8):
+            self.connect_points(m,  m+8, projected_points, 0)
+
+    def connect_points(self, i, j, k, offset):
+        a = k[i + offset]
+        b = k[j + offset]
+        arcade.draw_line(start_x=a[0], start_y=a[1], end_x=b[0], end_y=b[1], line_width=3, color=arcade.csscolor.BLACK)
+
     # sound stuff
     def play_song(self):
         self.player = self.song.play(loop=True)
 
 
 def main():
-    music_visualizer = Visualizer(default=RECTANGLE)
+    music_visualizer = Visualizer(default=TESSERACT)
 
     music_visualizer.setup()
     music_visualizer.play_song()
     arcade.run()
+
+
+class Tesseract():
+    def __init__(self):
+        self.color = arcade.csscolor.LIME
+
+        self.angle = 0
+        self.scale = 0
+        self.default_scale = 3500
+        self.speed = 0.04
+        self.points = [n for n in range(16)]
+
+        self.points[0] = [[-1], [-1], [1], [1]]
+        self.points[1] = [[1], [-1], [1], [1]]
+        self.points[2] = [[1], [1], [1], [1]]
+        self.points[3] = [[-1], [1], [1], [1]]
+        self.points[4] = [[-1], [-1], [-1], [1]]
+        self.points[5] = [[1], [-1], [-1], [1]]
+        self.points[6] = [[1], [1], [-1], [1]]
+        self.points[7] = [[-1], [1], [-1], [1]]
+        self.points[8] = [[-1], [-1], [1], [-1]]
+        self.points[9] = [[1], [-1], [1], [-1]]
+        self.points[10] = [[1], [1], [1], [-1]]
+        self.points[11] = [[-1], [1], [1], [-1]]
+        self.points[12] = [[-1], [-1], [-1], [-1]]
+        self.points[13] = [[1], [-1], [-1], [-1]]
+        self.points[14] = [[1], [1], [-1], [-1]]
+        self.points[15] = [[-1], [1], [-1], [-1]]
+
+    def tesseract_rotation(self, point):
+        tesseract_rotation = [[1, 0, 0],
+                              [0, math.cos(-math.pi/2), -math.sin(-math.pi/2)],
+                              [0, math.sin(-math.pi/2), math.cos(-math.pi/2)]]
+        return self.matrix_multiplication(tesseract_rotation, point)
+
+    # 3d matrix rotation
+    def rotation_x(self, point):
+        rotation_x = [[1, 0, 0],
+                      [0, math.cos(self.angle), -math.sin(self.angle)],
+                      [0, math.sin(self.angle), math.cos(self.angle)]]
+        return self.matrix_multiplication(rotation_x, point)
+
+    def rotation_y(self, point):
+        rotation_y = [[math.cos(self.angle), 0, -math.sin(self.angle)],
+                      [0, 1, 0],
+                      [math.sin(self.angle), 0, math.cos(self.angle)]]
+        return self.matrix_multiplication(rotation_y, point)
+
+    def rotation_z(self, point):
+        rotation_z = [[math.cos(self.angle), -math.sin(self.angle), 0],
+                      [math.sin(self.angle), math.cos(self.angle), 0],
+                      [0, 0, 1]]
+        return self.matrix_multiplication(rotation_z, point)
+
+    # 4d matrix rotation
+    def rotation4d_xy(self, point):
+        rotation4d_xy = [[math.cos(self.angle), -math.sin(self.angle), 0, 0],
+                         [math.sin(self.angle), math.cos(self.angle), 0, 0],
+                         [0, 0, 1, 0],
+                         [0, 0, 0, 1]]
+        return self.matrix_multiplication(rotation4d_xy, point)
+
+    def rotation4d_xz(self, point):
+        rotation4d_xz = [[math.cos(self.angle), 0, -math.sin(self.angle), 0],
+                         [0, 1, 0, 0],
+                         [math.sin(self.angle), 0, math.cos(self.angle), 0],
+                         [0, 0, 0, 1]]
+        return self.matrix_multiplication(rotation4d_xz, point)
+
+    def rotation4d_xw(self, point):
+        rotation4d_xw = [[math.cos(self.angle), 0, 0, -math.sin(self.angle)],
+                         [0, 1, 0, 0],
+                         [0, 0, 1, 0],
+                         [math.sin(self.angle), 0, 0, math.cos(self.angle)]]
+        return self.matrix_multiplication(rotation4d_xw, point)
+
+    def rotation4d_yz(self, point):
+        rotation4d_yz = [[1, 0, 0, 0],
+                         [0, math.cos(self.angle), -math.sin(self.angle), 0],
+                         [0, math.sin(self.angle), math.cos(self.angle), 0],
+                         [0, 0, 0, 1]]
+        return self.matrix_multiplication(rotation4d_yz, point)
+
+    def rotation4d_yw(self, point):
+        rotation4d_yw = [[1, 0, 0, 0],
+                         [0, math.cos(self.angle), 0, -math.sin(self.angle)],
+                         [0, 0, 1, 0],
+                         [0, math.sin(self.angle), 0, math.cos(self.angle)]]
+        return self.matrix_multiplication(rotation4d_yw, point)
+
+    def rotation4d_zw(self, point):
+        rotation4d_zw = [[1, 0, 0, 0],
+                         [0, 1, 0, 0],
+                         [0, 0, math.cos(self.angle), -math.sin(self.angle)],
+                         [0, 0, math.sin(self.angle), math.cos(self.angle)]]
+        return self.matrix_multiplication(rotation4d_zw, point)
+
+    def matrix_multiplication(self, a, b):
+        columns_a = len(a[0])
+        rows_a = len(a)
+        columns_b = len(b[0])
+        rows_b = len(b)
+
+        result_matrix = [[j for j in range(columns_b)] for i in range(rows_a)]
+        if columns_a == rows_b:
+            for x in range(rows_a):
+                for y in range(columns_b):
+                    sum = 0
+                    for k in range(columns_a):
+                        sum += a[x][k] * b[k][y]
+                    result_matrix[x][y] = sum
+
+            return result_matrix
+
+        else:
+            print("columns of the first matrix must be equal to the rows of the second matrix")
+            return None
 
 
 if __name__ == "__main__":
