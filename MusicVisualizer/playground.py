@@ -1,7 +1,7 @@
 import librosa
 import librosa.display
 import matplotlib.pyplot as plt
-from scipy.signal import savgol_filter, resample, decimate, resample_poly
+from scipy.signal import savgol_filter, resample, resample_poly
 import numpy as np
 
 
