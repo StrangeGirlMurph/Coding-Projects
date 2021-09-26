@@ -130,12 +130,9 @@ class Visualizer(arcade.Window):
                 self.update_single_value(self.smooth)
             elif self.option == TESSERACT:
                 self.update_single_value(self.smooth)
+                self.tesseract.angle += self.tesseract.speed * self.value * 2
                 if self.value < 0.4:
-                    self.tesseract.scale = (self.value + 0.2) * self.tesseract.default_scale
-                    self.tesseract.angle += self.tesseract.speed/2
-                else:
-                    self.tesseract.angle += self.tesseract.speed * self.value
-                    self.tesseract.scale = self.value * self.tesseract.default_scale
+                    self.tesseract.angle += 0.015
             self.frameNumber += 1
 
     def on_draw(self):
@@ -253,7 +250,7 @@ class Visualizer(arcade.Window):
             y = int(projected_2d[1][0] * self.tesseract.scale) + self.CENTER_Y
 
             projected_points[index] = [x, y]
-            arcade.draw_circle_filled(x, y, color=arcade.csscolor.LIME, radius=4)
+            # arcade.draw_circle_filled(x, y, color=arcade.csscolor.LIME, radius=4)
             index += 1
 
         # draw edges
@@ -273,7 +270,7 @@ class Visualizer(arcade.Window):
     def connect_points(self, i, j, k, offset):
         a = k[i + offset]
         b = k[j + offset]
-        arcade.draw_line(start_x=a[0], start_y=a[1], end_x=b[0], end_y=b[1], line_width=3, color=arcade.csscolor.BLACK)
+        arcade.draw_line(start_x=a[0], start_y=a[1], end_x=b[0], end_y=b[1], line_width=3, color=arcade.csscolor.DARK_VIOLET)
 
     # sound stuff
     def play_song(self):
@@ -293,8 +290,8 @@ class Tesseract():
         self.color = arcade.csscolor.LIME
 
         self.angle = 0
-        self.scale = 0
-        self.default_scale = 3500
+        self.default_scale = 2500
+        self.scale = self.default_scale
         self.speed = 0.04
         self.points = [n for n in range(16)]
 
