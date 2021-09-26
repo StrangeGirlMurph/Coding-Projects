@@ -26,11 +26,13 @@ SCREEN_TITLE = "music visualizer"
 # pictures
 KLEIN_BOTTLE_SPRITE = arcade.Sprite("media/Klein_bottle.png", scale=1, center_x=DEFAULT_WIDTH/2, center_y=DEFAULT_HEIGHT/2)
 
-# sound
-SONG = "source/INDUSTRY_BABY_feat_Jack_Harlow.wav"  # put your song here
-AUDIO_TIME_SERIES, SAMPLING_RATE = librosa.load(SONG)
-TEMPO, BEAT_FRAMES = librosa.beat.beat_track(y=AUDIO_TIME_SERIES, sr=SAMPLING_RATE)
-# BEATS = librosa.frames_to_time(BEAT_FRAMES, sr=SAMPLING_RATE)
+# songs
+INDUSTRY_BABY = "source/INDUSTRY_BABY_feat_Jack_Harlow.wav"  # put your song here
+ALIEN_BOY = "source/Alien_Boy.wav"
+ALL_IN_ALL = "source/All_in_all.wav"
+BOYS = "source/Boys.wav"
+SUICIDE_YEAR = "source/SUICIDE_YEAR.wav"
+
 
 FPS = 60  # (refresh rate of the visualizer)
 
@@ -53,7 +55,6 @@ class Visualizer(arcade.Window):
         self.CENTER_Y = DEFAULT_HEIGHT//2
 
         # sound stuff
-        self.song = arcade.Sound(SONG)
         self.player = None
 
         # logic stuff
@@ -67,8 +68,14 @@ class Visualizer(arcade.Window):
         self.value = 0  # the value at this part
         self.points = []  # self.points for the line strip graph or the point graph
 
-    def setup(self):
-        self.smooth = savgol_filter(abs(AUDIO_TIME_SERIES), window_length=2001, polyorder=3) * 2
+    def setup(self, song):
+        # enter the song here:
+        self.song = arcade.Sound(song)
+
+        self.AUDIO_TIME_SERIES, self.SAMPLING_RATE = librosa.load(song)
+        # TEMPO, BEAT_FRAMES = librosa.beat.beat_track(y=self.AUDIO_TIME_SERIES, sr=self.SAMPLING_RATE)
+        # BEATS = librosa.frames_to_time(BEAT_FRAMES, sr=SAMPLING_RATE)
+        self.smooth = savgol_filter(abs(self.AUDIO_TIME_SERIES), window_length=2001, polyorder=3) * 2
         self.tesseract = Tesseract()
 
     def on_resize(self, width, height):
@@ -78,6 +85,9 @@ class Visualizer(arcade.Window):
         self.CENTER_X = self.SCREEN_WIDTH//2
         self.CENTER_Y = self.SCREEN_HEIGHT//2
         print(f"Window resized to: {width}, {height}")
+
+        KLEIN_BOTTLE_SPRITE.center_x = self.CENTER_X
+        KLEIN_BOTTLE_SPRITE.center_y = self.CENTER_Y
 
     # handle keyboard input
     def on_key_press(self, key, modifiers):
@@ -122,7 +132,7 @@ class Visualizer(arcade.Window):
 
     def on_update(self, delta_time):
         if not self.pause:
-            self.part = int(self.song.get_stream_position(self.player) * SAMPLING_RATE)
+            self.part = int(self.song.get_stream_position(self.player) * self.SAMPLING_RATE)
 
             if self.option in (POINT_GRAPH, LINE_GRAPH):
                 self.update_points(self.smooth)
@@ -250,7 +260,7 @@ class Visualizer(arcade.Window):
             y = int(projected_2d[1][0] * self.tesseract.scale) + self.CENTER_Y
 
             projected_points[index] = [x, y]
-            # arcade.draw_circle_filled(x, y, color=arcade.csscolor.LIME, radius=4)
+            arcade.draw_circle_filled(x, y, color=arcade.csscolor.DARK_VIOLET, radius=4)
             index += 1
 
         # draw edges
@@ -280,7 +290,7 @@ class Visualizer(arcade.Window):
 def main():
     music_visualizer = Visualizer(default=TESSERACT)
 
-    music_visualizer.setup()
+    music_visualizer.setup(song=INDUSTRY_BABY)
     music_visualizer.play_song()
     arcade.run()
 

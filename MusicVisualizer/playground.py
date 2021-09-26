@@ -14,26 +14,34 @@ def main():
 
     SAMPLE_RATE = 100
 
+    # compare downsampling functions ---
     # plotting
     fig, ax = plt.subplots()
     ax.set(xlim=[0, 10])
 
-    # compare downsampling functions
     downrate = resample(y, int((len(y)/sr)*SAMPLE_RATE))
     downsample = resample_poly(y, 2, int(sr/SAMPLE_RATE)*2)
 
     librosa.display.waveshow(np.abs(y), sr=sr, label="default")
-    librosa.display.waveshow(downrate, sr=SAMPLE_RATE, label="downrate")
-    librosa.display.waveshow(downsample, sr=SAMPLE_RATE, label="downsample")
+    librosa.display.waveshow(downrate, sr=SAMPLE_RATE, label="resample")
+    librosa.display.waveshow(downsample, sr=SAMPLE_RATE, label="resample_poly")
 
-    # compare smoothing
+    # plotting
+    ax.legend()
+    plt.show()
+
+    # compare smoothing ----
+    # plotting
+    fig, ax = plt.subplots()
+    ax.set(xlim=[0, 10])
+
     downrate = resample(y, int((len(y)/sr)*SAMPLE_RATE))
     smooth = savgol_filter(np.abs(downrate), window_length=int(SAMPLE_RATE/10)+1, polyorder=3)
     smoothy = savgol_filter(np.abs(y), window_length=2001, polyorder=3)
 
     librosa.display.waveshow(np.abs(y), sr=sr, label="default")
-    librosa.display.waveshow(smoothy, sr=sr, label="default smooth")
-    librosa.display.waveshow(smooth, sr=SAMPLE_RATE, label="downrate smooth")
+    librosa.display.waveshow(smoothy, sr=sr, label="default smoothed")
+    librosa.display.waveshow(smooth, sr=SAMPLE_RATE, label="resample smoothed")
 
     # plotting
     ax.legend()
