@@ -7,6 +7,8 @@ Ideas:
 - something in the terminal
 - maybe something with arduinos and hardware
 
+You can find the tesseract here: github.com/Josephbakulikira/4D-hypercube-with-pygame-aka-tesseract
+
 ## Usage
 
 ### Getting started
@@ -28,3 +30,4 @@ Press these letters to change the visualizer on the flow
 - ``g`` for LINE_GRAPH
 - ``k`` for KLEIN_BOTTLE
 - ``t`` for TESSERACT
+
