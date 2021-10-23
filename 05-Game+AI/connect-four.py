@@ -1,4 +1,5 @@
 # code partly copyed from Keith Galli
+# https://github.com/KeithGalli/Connect4-Python
 
 from arcade.color import WHITE
 import numpy as np
