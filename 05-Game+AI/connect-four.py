@@ -70,15 +70,15 @@ class Connect4(arcade.Window):
 
                     if self.winning_move(1):
                         self.game_over = True
-                        arcade.draw_text("Player\n 1 wins!!", 0, SCREEN_HEIGHT-SQUARESIZE/2, self.colorPlayer1,
-                                         font_size=12, width=600, align="left")
+                        #arcade.draw_text("Player\n 1 wins!!", 0, SCREEN_HEIGHT-SQUARESIZE/2, self.colorPlayer1,font_size=12, width=600, align="left")
+                        print("Player 1 wins !!!")
                 else:
                     self.drop_piece(row, col, 2)
 
                     if self.winning_move(2):
                         self.game_over = True
-                        arcade.draw_text("Player\n 2 wins!!", 0, SCREEN_HEIGHT-SQUARESIZE/2, self.colorPlayer2,
-                                         font_size=12, width=600, align="left")
+                        #arcade.draw_text("Player\n 2 wins!!", 0, SCREEN_HEIGHT-SQUARESIZE/2, self.colorPlayer2,font_size=12, width=600, align="left")
+                        print("Player 2 wins !!!")
 
                 self.print_board()
 
