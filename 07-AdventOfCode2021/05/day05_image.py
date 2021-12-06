@@ -1,3 +1,5 @@
+# creates an image out of the text output
+
 from math import ceil
 
 from PIL import (
