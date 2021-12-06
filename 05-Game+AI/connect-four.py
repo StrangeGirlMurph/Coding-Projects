@@ -1,7 +1,7 @@
 # code partly copyed from Keith Galli
 # https://github.com/KeithGalli/Connect4-Python
 
-from arcade.color import WHITE
+from arcade.color import SKY_BLUE, WHITE
 import numpy as np
 import arcade
 import math
@@ -12,10 +12,11 @@ WHITE = arcade.csscolor.WHITE
 RED = arcade.csscolor.RED
 YELLOW = arcade.csscolor.YELLOW
 AMAZON = arcade.color.AMAZON
+GREEN = arcade.csscolor.LIME_GREEN
 # font myfont = pygame.font.SysFont("monospace", 75)
 
 ROW_COUNT = 6
-COLUMN_COUNT = 7
+COLUMN_COUNT = 9
 
 SQUARESIZE = 140
 RADIUS = int(SQUARESIZE/2 - 15)
@@ -29,8 +30,8 @@ class Connect4(arcade.Window):
     def __init__(self, width, height, title):
         super().__init__(width, height, title)
 
-        self.colorPlayer1 = RED
-        self.colorPlayer2 = YELLOW
+        self.colorPlayer1 = SKY_BLUE
+        self.colorPlayer2 = GREEN
         self.colorBackground = WHITE
         self.colorGrid = AMAZON
         arcade.set_background_color(self.colorGrid)
