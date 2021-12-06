@@ -1,4 +1,8 @@
 import os
 
-for i in range(3, 32):
-    open('day%02i/day%02i.py' % (i, i), 'x')
+
+dir = os.listdir(os.curdir)
+i = 1
+for d in dir:
+    os.rename(d, "%02i" % i)
+    i += 1
