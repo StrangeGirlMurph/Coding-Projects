@@ -3,7 +3,6 @@
 # a full row/column wins
 # score: sum of all unmarked numbers on the board times the winning number
 import numpy as np
-import sys
 
 lines = open("input.txt", "r").readlines()
 lines = [line[:-1] for line in lines]
