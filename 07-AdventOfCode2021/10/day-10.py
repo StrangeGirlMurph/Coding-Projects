@@ -37,21 +37,31 @@ for lineidx, line in enumerate(lines):
         somethingiswrong = False
 
         if set(closingBrackets).isdisjoint(line):
-            # checks if line is incomplete
+            # checks if line is incomplete (there are only opening brackets)
             filteredLines.append(line)  # for part 2
             break
         else:
             for idx, i in enumerate(line):
+                # loop through every bracket
+
                 if idx != len(line) - 1:
+                    # prevents the index out of range when comparing to the next one
+
                     if line[idx + 1] in closingBrackets:
+                        # if the next bracket is a closing bracket
+
                         if matching[i] == line[idx + 1]:
-                            del line[idx:idx+2]
-                            break
+                            # if the closing bracket matches the opening bracket
+
+                            del line[idx:idx+2]  # delet that pair
+                            break  # begin looping from the fron
                         else:
-                            score[line[idx + 1]] += 1
+                            # they doesnt match
+                            score[line[idx + 1]] += 1  # increase the score of that type
                             somethingiswrong = True
                             break
         if somethingiswrong:
+            # goes to the next line if there was a mismatching pair of brackets
             break
 
 for bracket in points:
