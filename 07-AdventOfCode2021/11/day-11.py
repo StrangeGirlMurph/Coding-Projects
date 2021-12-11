@@ -6,7 +6,9 @@
 
 import numpy as np
 
-lines = open("input.txt", "r").readlines()
+with open('input.txt', 'r') as f:
+    lines = f.readlines()
+
 lines = [line[:-1] for line in lines]
 lines = [list(line) for line in lines]
 grid = np.array([list(int(item) for item in line) for line in lines])
