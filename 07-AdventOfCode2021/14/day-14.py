@@ -41,7 +41,7 @@ for idx, char in enumerate(template[:-1]):
 # print("Rules", insertionRules)
 
 
-def increasePair(dict, key, insertion, numtimes):
+def modifyPairs(dict, key, insertion, numtimes):
     pair1 = key[0] + insertion
     pair2 = insertion + key[1]
 
@@ -60,7 +60,7 @@ for i in range(1, 41):
     for key in dict(pairdict):
 
         if key in insertionRules:
-            tempdict = increasePair(tempdict, key, insertionRules[key], pairdict[key])
+            tempdict = modifyPairs(tempdict, key, insertionRules[key], pairdict[key])
 
             count.setdefault(insertionRules[key], 0)
             count[insertionRules[key]] += pairdict[key]
