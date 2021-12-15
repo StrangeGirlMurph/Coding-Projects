@@ -1,51 +1,56 @@
 import numpy as np
 
-with open('input.txt', 'r') as f:
+with open('testinput.txt', 'r') as f:
     lines = f.readlines()
 lines = np.array([list(line[:-1]) for line in lines])
 baseGrid = lines.astype(np.uint16)
-
-baseGrid[0][0] = 0  # dont visit the start again
-
-print(baseGrid)
-
-# distances = np.zeros((100, 100))
-# for (x, y), val in np.ndenumerate(distances):
-#     distances[x][y] = x + y
-
-# distances = distances[::-1, ::-1]  # flip
-# print(distances)
-
-bestScore = float("inf")
+size = len(baseGrid)
 
 
-def searchPath(grid, posy, posx, currentscore):
-    # search the adjacent sides recursively
-    if posx + posy == 200:  # reached the end
-        global bestScore
-        if currentscore < bestScore:
-            bestScore = currentscore
-    else:
-        # go through all neighbors
-        for (dy, dx), val in np.ndenumerate(grid[posy-1:posy+2, posx-1:posx+2]):
+def findCheapestPath(grid):
+    gridSize = len(grid)
 
-            # if legal step (not already visited (val != 0) + (dy+dx) % 2 != 0 filters the diagonals)
-            # dy+dx
-            # 0 1 2
-            # 1 2 3
-            # 2 3 4
-            if val != 0 and (dy+dx) % 2 != 0:
-                newy = posy - 1 + dy
-                newx = posx - 1 + dx
+    costs = np.zeros((gridSize, gridSize), dtype=np.uint32)
+    costs = costs + float("inf")
+    costs[0][0] = 0
 
-                currentscore += val
+    # loops through all the diagonals
+    for NrDiagonal in range(1, gridSize):
 
-                tempGrid = grid
-                tempGrid[newy][newx] = 0
-                searchPath(tempGrid, newy, newx)
+        # goes through all the elements in that diagonal
+        for idxY in range(0, NrDiagonal+1):
+
+            # edge cases
+            if idxY == 0:
+                costs[0][NrDiagonal] = costs[0][NrDiagonal-1] + grid[0][NrDiagonal]
+            elif idxY == NrDiagonal:
+                costs[NrDiagonal][0] = costs[NrDiagonal-1][0] + grid[NrDiagonal][0]
+            else:
+                costs[idxY][NrDiagonal-idxY] = min([costs[idxY-1][NrDiagonal-idxY], costs[idxY][NrDiagonal-idxY-1]]) + grid[idxY][NrDiagonal-idxY]
+
+    # loops through all the diagonals second half
+    for NrDiagonal in range(1, gridSize):
+        # goes through all the elements in that diagonal
+        for idxX in range(0, gridSize-NrDiagonal):
+            costs[gridSize-1-idxX][NrDiagonal + idxX] = min([costs[gridSize-1-idxX][NrDiagonal + idxX-1], costs[gridSize-1-idxX-1][NrDiagonal + idxX]]) + grid[gridSize-1-idxX][NrDiagonal + idxX]
+
+    print(costs)
+    print("What is the lowest total risk of any path from the top left to the bottom right?", int(costs[-1][-1]))
 
 
-startingGrid = np.pad(baseGrid, 1, mode="constant", constant_values=0)
-searchPath(startingGrid, posy=1, posx=1, currentscore=0)
+# part 1
+Grid1 = np.copy(baseGrid)
+Grid1[0][0] = 0  # dont visit the start again
+findCheapestPath(Grid1)
 
-print(bestScore)
+# part 2
+Grid2 = np.tile(baseGrid, (5, 5))
+
+for (dy, dx), val in np.ndenumerate(np.zeros((5, 5))):
+    Grid2[(dy*size):((dy+1)*size), (dx*size):((dx+1)*size)] += dy+dx  # chunks
+    Grid2[(dy*size):((dy+1)*size), (dx*size):((dx+1)*size)] = Grid2[(dy*size):((dy+1)*size), (dx*size):((dx+1)*size)] % 9
+
+Grid2[Grid2 == 0] = 9
+Grid2[0][0] = 0
+
+# findCheapestPath(Grid2)
