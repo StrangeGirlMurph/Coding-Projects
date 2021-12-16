@@ -3,16 +3,34 @@ import numpy as np
 with open('input.txt', 'r') as f:
     hex = f.readline()[:-1]
 
-testLiteral = "D2FE28"  # 2021
-testOperatorID0 = "38006F45291200"
-testOperatorID1 = "EE00D40C823060"
-test = "8A004A801A8002F478"
-test2 = "620080001611562C8802118E34"
-
 basis = bin(int('1' + hex, 16))[3:]
-
 sumVersionNumbers = 0
-result = 0
+
+
+def determinReturnValue(results, typeID):
+    if typeID == 0:
+        return sum(results)
+    elif typeID == 1:
+        return np.prod(results)
+    elif typeID == 2:
+        return min(results)
+    elif typeID == 3:
+        return max(results)
+    elif typeID == 5:
+        if results[0] > results[1]:
+            return 1
+        else:
+            return 0
+    elif typeID == 6:
+        if results[0] < results[1]:
+            return 1
+        else:
+            return 0
+    elif typeID == 7:
+        if results[0] == results[1]:
+            return 1
+        else:
+            return 0
 
 
 def readPacket(package):
@@ -35,37 +53,34 @@ def readPacket(package):
         value = int(value, 2)
 
         rest = body[(i+1)*5:]
-        return rest
+        return rest, value
     else:
         # operator
-
+        results = []
         lengthtypeID = body[0]
 
         if lengthtypeID == "0":
             # length in bits
             totalLength = int(body[1:16], 2)
             newbody = body[16:16+totalLength]
-            while newbody != "" and "1" in newbody:
-                newbody = readPacket(newbody)
 
-            return body[16+totalLength:]
+            while newbody != "" and "1" in newbody:
+                newbody, value = readPacket(newbody)
+                results.append(value)
+
+            return body[16+totalLength:], determinReturnValue(results, typeID)
         else:
             # number of sub-packets
             numberSubpackets = int(body[1:12], 2)
             remainder = body[12:]
             for i in range(numberSubpackets):
-                remainder = readPacket(remainder)
-            return remainder
+                remainder, value = readPacket(remainder)
+                results.append(value)
+
+            return remainder, determinReturnValue(results, typeID)
 
 
-def main(basis):
-    remainder = basis
-
-    while remainder != "" and "1" in remainder:
-        remainder = readPacket(remainder)
-
-
-main(basis)
+remainder, finalvalue = readPacket(basis)
 
 print("What do you get if you add up the version numbers in all packets?", sumVersionNumbers)
-print("What do you get if you evaluate the expression represented by your hexadecimal-encoded BITS transmission?", result)
+print("What do you get if you evaluate the expression represented by your hexadecimal-encoded BITS transmission?", finalvalue)
