@@ -17,20 +17,11 @@ def determinReturnValue(results, typeID):
     elif typeID == 3:
         return max(results)
     elif typeID == 5:
-        if results[0] > results[1]:
-            return 1
-        else:
-            return 0
+        return int(results[0] > results[1])
     elif typeID == 6:
-        if results[0] < results[1]:
-            return 1
-        else:
-            return 0
+        return int(results[0] < results[1])
     elif typeID == 7:
-        if results[0] == results[1]:
-            return 1
-        else:
-            return 0
+        return int(results[0] == results[1])
 
 
 def readPacket(package):
@@ -43,7 +34,6 @@ def readPacket(package):
 
     if typeID == 4:
         # literal value
-
         value = ""
         i = 0
         while body[i*5] == "1":
