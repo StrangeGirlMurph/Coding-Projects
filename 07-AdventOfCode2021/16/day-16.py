@@ -44,7 +44,9 @@ def readPacket(package):
         if lengthtypeID == "0":
             # length in bits
             totalLength = int(body[1:16], 2)
-            main(body[16:16+totalLength])
+            newbody = body[16:16+totalLength]
+            while newbody != "" and "1" in newbody:
+                newbody = readPacket(newbody)
 
             return body[16+totalLength:]
         else:
