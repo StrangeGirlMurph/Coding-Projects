@@ -6,8 +6,7 @@ lines = np.array([list(line[:-1]) for line in lines])
 baseGrid = lines.astype(np.float32)
 size = len(baseGrid)
 
-# !!! This doesn't cover most cases. Both parts currently only work for the example input. !!!
-# For my input it only works for part 1
+# !!! This doesn't cover most cases. This probably only works for my input and the example Input. !!!
 
 
 def checkValue(grid, costs, xpos, ypos):
@@ -42,6 +41,53 @@ def checksSecondhalf(grid, gridSize, costs, NrDiagonal):
     return costs
 
 
+def doubleCheckFirstHalf(grid, costs, NrDiagonal):
+    for element in range(0, NrDiagonal+1):
+        xpos = (NrDiagonal-element) + 1  # position in the grid
+        ypos = element + 1  # position in the grid
+        up = costs[ypos-1][xpos]
+        left = costs[ypos][xpos-1]
+
+        if costs[ypos][xpos] + grid[ypos-1][xpos] < up:
+            # print(grid)  # [ypos-2:ypos+3, xpos-2:xpos+3]
+            # print(costs)  # [ypos-2:ypos+3, xpos-2:xpos+3]
+
+            costs[ypos-1][xpos] = costs[ypos][xpos] + grid[ypos-1][xpos]
+            costs = checkValue(grid, costs, xpos+1, ypos-1)
+
+        if costs[ypos][xpos] + grid[ypos][xpos-1] < left:
+            # print(grid)  # [ypos-2:ypos+3, xpos-2:xpos+3]
+            # print(costs)  # [ypos-2:ypos+3, xpos-2:xpos+3]
+
+            costs[ypos][xpos-1] = costs[ypos][xpos] + grid[ypos][xpos-1]
+            costs = checkValue(grid, costs, xpos-1, ypos+1)
+
+    return costs
+
+
+def doubleCheckSecondHalf(grid, gridSize, costs, NrDiagonal):
+    for element in range(0, gridSize-NrDiagonal):
+        xpos = (element + NrDiagonal) + 1
+        ypos = (gridSize-1-element) + 1
+        up = costs[ypos-1][xpos]
+        left = costs[ypos][xpos-1]
+
+        if costs[ypos][xpos] + grid[ypos-1][xpos] < up:
+            # print(grid)  # [ypos-2:ypos+3, xpos-2:xpos+3]
+            # print(costs)  # [ypos-2:ypos+3, xpos-2:xpos+3]
+
+            costs[ypos-1][xpos] = costs[ypos][xpos] + grid[ypos-1][xpos]
+            costs = checkValue(grid, costs, xpos+1, ypos-1)
+
+            # print(costs)  # [ypos-2:ypos+3, xpos-2:xpos+3]
+
+        if costs[ypos][xpos] + grid[ypos][xpos-1] < left:
+            costs[ypos][xpos-1] = costs[ypos][xpos] + grid[ypos][xpos-1]
+            costs = checkValue(grid, costs, xpos-1, ypos+1)
+
+    return costs
+
+
 def findCheapestPath(grid):
     gridSize = len(grid)
     grid = np.pad(grid, 1, mode="constant", constant_values=float("inf"))
@@ -54,13 +100,15 @@ def findCheapestPath(grid):
     # loops through all the diagonals
     for NrDiagonal in range(1, gridSize):
         costs = checksFirsthalf(grid, costs, NrDiagonal)
+        costs = doubleCheckFirstHalf(grid, costs, NrDiagonal)
 
     # loops through all the diagonals in second half
     for NrDiagonal in range(1, gridSize):
         costs = checksSecondhalf(grid, gridSize, costs, NrDiagonal)
+        costs = doubleCheckSecondHalf(grid, gridSize, costs, NrDiagonal)
 
     print("Costs to reach every point:")
-    print(costs[1:gridSize+1, 1:gridSize+1])
+    print(costs[1:gridSize+1, 1:gridSize+1].astype(np.uint16))
     print("What is the lowest total risk of any path from the top left to the bottom right?", int(costs[-2][-2]))
 
 
