@@ -106,11 +106,24 @@ def getValueAtIndex(num, idx):
     return num
 
 
+def changeValueAtIndex(num, idx, value):
+    if len(idx) == 5:
+        num[idx[0]][idx[1]][idx[2]][idx[3]][idx[4]] += value
+    elif len(idx) == 4:
+        num[idx[0]][idx[1]][idx[2]][idx[3]] += value
+    elif len(idx) == 3:
+        num[idx[0]][idx[1]][idx[2]] += value
+    elif len(idx) == 2:
+        num[idx[0]][idx[1]] += value
+    elif len(idx) == 1:
+        num[idx[0]] += value
+    return num
+
+
 def explode(num, item, idx):
     # store values to add:
     left = item[0]
     right = item[1]
-
     # the exploding pair is replaced with the regular number 0
     num[idx[0]][idx[1]][idx[2]][idx[3]] = 0
 
@@ -123,18 +136,7 @@ def explode(num, item, idx):
 
             while type(getValueAtIndex(num, idxLeft)) == list:
                 idxLeft.append(1)
-
-            if len(idxLeft) == 5:
-                num[idxLeft[0]][idxLeft[1]][idxLeft[2]][idxLeft[3]][idxLeft[4]] += left
-            elif len(idxLeft) == 4:
-                num[idxLeft[0]][idxLeft[1]][idxLeft[2]][idxLeft[3]] += left
-            elif len(idxLeft) == 3:
-                num[idxLeft[0]][idxLeft[1]][idxLeft[2]] += left
-            elif len(idxLeft) == 2:
-                num[idxLeft[0]][idxLeft[1]] += left
-            elif len(idxLeft) == 1:
-                num[idxLeft[0]] += left
-
+            num = changeValueAtIndex(num, idxLeft, left)
             break
 
     # right
@@ -145,17 +147,7 @@ def explode(num, item, idx):
 
             while type(getValueAtIndex(num, idxRight)) == list:
                 idxRight.append(0)
-
-            if len(idxRight) == 5:
-                num[idxRight[0]][idxRight[1]][idxRight[2]][idxRight[3]][idxRight[4]] += right
-            elif len(idxRight) == 4:
-                num[idxRight[0]][idxRight[1]][idxRight[2]][idxRight[3]] += right
-            elif len(idxRight) == 3:
-                num[idxRight[0]][idxRight[1]][idxRight[2]] += right
-            elif len(idxRight) == 2:
-                num[idxRight[0]][idxRight[1]] += right
-            elif len(idxRight) == 1:
-                num[idxRight[0]] += right
+            num = changeValueAtIndex(num, idxRight, right)
             break
 
     return num
