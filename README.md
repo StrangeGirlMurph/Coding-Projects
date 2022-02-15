@@ -10,5 +10,5 @@ Many aren't finished at all and a total mess even I don't understand. Some on th
 | 03-CollatzConjecture          | partly finished but not really good |
 | 04-MusicVisualizer            | kinda finished                      |
 | 05-Game+AI                    | in progress                         |
-| 06-PendulumPhysicsSimulations | not started                         |
+| 06-PendulumPhysicsSimulations | basics done :)                      |
 | 07-AdventOfCode2021           | in progress                         |
