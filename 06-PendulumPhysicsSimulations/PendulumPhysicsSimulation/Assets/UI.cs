@@ -9,20 +9,20 @@ public class UI : MonoBehaviour
     float g;
     int angle;
     GameObject rod;
-    Pendulum physics;
+    Pendulum script;
 
     // Start is called before the first frame update
     void Start()
     {
         rod = GameObject.Find("Pendulum");
-        physics = rod.GetComponent<Pendulum>();
+        script = rod.GetComponent<Pendulum>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        g = physics.g;
-        angle = (int)(physics.angleDeg);
+        g = script.g;
+        angle = (int)(script.angleDeg);
         gText.text = $"angle: {angle} \ng: {g}";
     }
 }
