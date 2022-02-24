@@ -12,3 +12,4 @@ Many aren't finished at all and a total mess even I don't understand. Some on th
 | 05-Game+AI                    | in progress                         |
 | 06-PendulumPhysicsSimulations | basics done :)                      |
 | 07-AdventOfCode2021           | in progress                         |
+| 08-Ecosystems                 | in progress                         |
