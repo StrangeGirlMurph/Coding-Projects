@@ -12,52 +12,59 @@ public class CameraMovement : MonoBehaviour
     Vector3 center = Vector3.up * 5;
 
     // variables
-    float maxAngle = 88f;
-    float minAngle = 2f;
-    int maxHeight = 9;
-    int minHeight = 0;
-    int maxDistance = 60;
-    int minDistance = 0;
+    [Header("Settings")]
+    [SerializeField] float maxAngle = 88f;
+    [SerializeField] float minAngle = 2f;
+    [SerializeField] float maxHeight = 9;
+    [SerializeField] float minHeight = 0;
+    [SerializeField] float maxDistance = 60;
+    [SerializeField] float minDistance = 0;
+    [SerializeField] bool freeView = true;
 
-    
     void Start()
     {
-        //Cursor.lockState = CursorLockMode.Locked;
-
+        Cursor.lockState = CursorLockMode.Locked;
         // - init -
-        // center
-        center = Vector3.up * initHeight;
-        // angle
-        Vector3 around = Vector3.Cross(transform.forward, Vector3.up);
-        transform.RotateAround(center, around, transform.eulerAngles.x - initAngle);  
-        // position
-        transform.position = -transform.forward * distance + center;
+        defaultView();
     }
 
-    
+
     void Update()
     {
         //Debug.DrawRay(transform.position, transform.forward * 5, Color.green, 2f);
 
         if (Input.GetMouseButton(0))
         {
-            Vector2 turn;
-            turn.x = Input.GetAxis("Mouse X") * mouseMovementSensitivity;
-            turn.y = Input.GetAxis("Mouse Y") * mouseMovementSensitivity;
-            transform.RotateAround(center, Vector3.up, turn.x);
+            float horizontal = Input.GetAxis("Mouse X") * mouseMovementSensitivity;
+            float vertical = -Input.GetAxis("Mouse Y") * mouseMovementSensitivity;
+
+            // horizontal rotation
+            transform.RotateAround(center, Vector3.up, horizontal);
 
             // vertical rotation
-            if (transform.eulerAngles.x - turn.y >= minAngle & transform.eulerAngles.x - turn.y <= maxAngle)
+            if (freeView)
             {
                 Vector3 around = Vector3.Cross(transform.forward, Vector3.up);
-                transform.RotateAround(center, around, turn.y);
+                transform.RotateAround(center, around, vertical);
             }
-        } 
+            else
+            {
+                float angle = transform.eulerAngles.x;
+                angle = (angle > 180) ? angle - 360 : angle;
+                if (angle + vertical >= minAngle & angle + vertical < maxAngle)
+                {
+                    Vector3 around = Vector3.Cross(transform.forward, Vector3.up);
+                    transform.RotateAround(center, around, -vertical);
+                }
+            }
+
+        }
 
         if (Input.GetMouseButton(1))
         {
             float zoom = Input.GetAxis("Mouse X") * mouseZoomingSensitivity;
-            if (distance - zoom >= minDistance & distance - zoom <= maxDistance) {
+            if (distance - zoom >= minDistance & distance - zoom <= maxDistance)
+            {
                 distance -= zoom;
                 transform.position = -transform.forward * distance + center;
             }
@@ -68,13 +75,27 @@ public class CameraMovement : MonoBehaviour
         {
             center += Vector3.up;
             transform.position += Vector3.up;
-            transform.LookAt(center);
         }
-        if (Input.GetKeyDown(KeyCode.DownArrow) & center.y >= minHeight + 1)
+        else if (Input.GetKeyDown(KeyCode.DownArrow) & center.y >= minHeight + 1)
         {
             center += Vector3.down;
             transform.position += Vector3.down;
-            transform.LookAt(center);
         }
+        else if (Input.GetKeyDown(KeyCode.D))
+        {
+            defaultView();
+        }
+        else if (Input.GetKeyDown(KeyCode.T))
+        {
+            transform.rotation = Quaternion.Euler(90, 0, 0);
+            transform.position = -transform.forward * distance + center;
+        }
+    }
+
+    void defaultView()
+    {
+        center = Vector3.up * initHeight; // center
+        transform.rotation = Quaternion.Euler(initAngle, 0, 0); // angle
+        transform.position = -transform.forward * distance + center; // position
     }
 }
