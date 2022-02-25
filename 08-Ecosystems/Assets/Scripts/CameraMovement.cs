@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class CameraMovement : MonoBehaviour
 {
@@ -70,25 +71,44 @@ public class CameraMovement : MonoBehaviour
             }
         }
 
-        // move center
+        // keyboard input
         if (Input.GetKeyDown(KeyCode.UpArrow) & center.y <= maxHeight - 1)
         {
+            // move center up
             center += Vector3.up;
             transform.position += Vector3.up;
         }
         else if (Input.GetKeyDown(KeyCode.DownArrow) & center.y >= minHeight + 1)
         {
+            // move center down
             center += Vector3.down;
             transform.position += Vector3.down;
         }
+        else if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            // turn 90 deg left
+            transform.RotateAround(center, Vector3.up, 90);
+        }
+        else if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            // turn 90 def right
+            transform.RotateAround(center, Vector3.up, -90);
+        }
         else if (Input.GetKeyDown(KeyCode.D))
         {
+            // default view
             defaultView();
         }
         else if (Input.GetKeyDown(KeyCode.T))
         {
+            // top down view
             transform.rotation = Quaternion.Euler(90, 0, 0);
             transform.position = -transform.forward * distance + center;
+        }
+        else if (Input.GetKeyDown(KeyCode.R))
+        {
+            // restart
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
     }
 
