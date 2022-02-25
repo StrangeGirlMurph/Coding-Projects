@@ -5,11 +5,11 @@ Many aren't finished at all and a total mess even I don't understand. Some on th
 ## Status
 | Project                       | Status                              |
 | ----------------------------- | ----------------------------------- |
-| 01-MathRiddle                 | in progress                         |
-| 02-ConwaysGameOfLife          | kinda finished                      |
-| 03-CollatzConjecture          | partly finished but not really good |
-| 04-MusicVisualizer            | kinda finished                      |
-| 05-Game+AI                    | in progress                         |
-| 06-PendulumPhysicsSimulations | basics done :)                      |
-| 07-AdventOfCode2021           | in progress                         |
+| 01-MathRiddle                 | on halt (not finished)                            |
+| 02-ConwaysGameOfLife          | working version                      |
+| 03-CollatzConjecture          | its working but I am not satisfied  |
+| 04-MusicVisualizer            | working version                      |
+| 05-Game+AI                    | on halt (not finished)                          |
+| 06-PendulumPhysicsSimulations | basics done                      |
+| 07-AdventOfCode2021           | basically done                         |
 | 08-Ecosystems                 | in progress                         |
