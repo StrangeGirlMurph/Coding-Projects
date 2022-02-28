@@ -9,3 +9,6 @@ Usage:
 - [arrow left/right] rotate 90 deg left/right
 - [d] default view
 - [t] top down view
+
+Todo:
+- Make cursor invisible

@@ -16,11 +16,11 @@ public class CameraMovement : MonoBehaviour
     [Header("Settings")]
     [SerializeField] float maxAngle = 88f;
     [SerializeField] float minAngle = 2f;
+    [SerializeField] bool freeView = true;
     [SerializeField] float maxHeight = 9;
     [SerializeField] float minHeight = 0;
     [SerializeField] float maxDistance = 60;
     [SerializeField] float minDistance = 0;
-    [SerializeField] bool freeView = true;
 
     void Start()
     {

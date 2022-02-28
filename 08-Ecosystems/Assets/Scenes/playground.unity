@@ -1006,11 +1006,11 @@ MonoBehaviour:
   initHeight: 2
   maxAngle: 88
   minAngle: -88
+  freeView: 0
   maxHeight: 9
   minHeight: 0
   maxDistance: 60
   minDistance: 0
-  freeView: 0
 --- !u!1001 &751154463
 PrefabInstance:
   m_ObjectHideFlags: 0
