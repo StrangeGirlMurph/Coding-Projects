@@ -56,7 +56,11 @@ public class CameraMovement : MonoBehaviour
                 if (angle + vertical >= minAngle & angle + vertical < maxAngle)
                 {
                     Vector3 around = Vector3.Cross(transform.forward, Vector3.up);
-                    transform.RotateAround(center, around, -vertical);
+                    Vector3 nextPosition = Quaternion.AngleAxis(-vertical, around) * transform.position;
+                    transform.position = nextPosition;
+                    transform.LookAt(center);
+                    //transform.position = Vector3.Lerp(transform.position, nextPosition, Time.deltaTime); // to smooth
+                    //transform.RotateAround(center, around, -vertical); // original
                 }
             }
 

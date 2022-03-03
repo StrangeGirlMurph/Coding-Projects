@@ -11,3 +11,6 @@ Usage:
 - [t] top down view
 - [r] reseting the simulation
 - [Spacebar] pausing the simulation
+
+![Main Image](Images/Screenshot (8).png)
+![Second Image](Images/Screenshot (7).png)
