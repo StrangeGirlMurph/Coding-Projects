@@ -12,5 +12,5 @@ Usage:
 - [r] reseting the simulation
 - [Spacebar] pausing the simulation
 
-![Main Image](Images/Screenshot (8).png)
-![Second Image](Images/Screenshot (7).png)
+![Main Image](Images/Screenshot1.png)
+![Second Image](Images/Screenshot2.png)
