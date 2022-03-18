@@ -1,0 +1,16 @@
+{
+  "name": "princess-artemis",
+  "version": "1.0.0",
+  "description": "My first Discord bot! yay",
+  "main": "public/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Murph",
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^13.6.0",
+    "dotenv": "^16.0.0",
+    "node-fetch": "^2.6.7"
+  }
+}
