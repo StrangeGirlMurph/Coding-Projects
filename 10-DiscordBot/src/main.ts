@@ -1,27 +1,14 @@
-import { Client } from 'discord.js';
+import { Client, Intents } from 'discord.js';
 
-import "dotenv/config";
-import { commandHandler } from "./commandHandler";
+import "dotenv/config"; // config .env
+import { setup } from './setup';
 
-const client = new Client({ intents: ["GUILDS", "GUILD_MESSAGES", "DIRECT_MESSAGES"] });
+// define needed intents for the bot
+const intents: number[] = [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MESSAGE_TYPING]
 
-client.login(process.env.TOKEN);
+// initialize the client of the application
+export const client = new Client({ intents: intents });
 
-const statusChannelId = "954392404813832203"
+client.login(process.env.DISCORD_BOT_TOKEN); // login
 
-client.once('ready', () => {
-    console.log('Beep Boop 🤖 \nI am ready 🐇');
-
-    // client.channels.fetch("954392404813832203").then((channel: any) => {
-    //     channel.send("I am awake :) Hey everyone I love you")
-    // }).catch(console.error);
-});
-
-client.on("messageCreate", (msg) => {
-    if (msg.author.bot) return;
-    if (msg.inGuild()) {
-        if (msg.channel.parentId === "953313361918042132") {
-            commandHandler(msg)
-        }
-    }
-})
+setup(client);

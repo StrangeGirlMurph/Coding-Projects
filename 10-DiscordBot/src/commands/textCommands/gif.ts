@@ -1,12 +1,13 @@
 import { Message } from "discord.js";
 import fetch from "node-fetch";
 
-export async function gif(msg: Message, args: string): Promise<void> {
+export default async function (msg: Message, args: string) {
     let search = "cute cat";
     if (args.length > 0) {
         search = args
     }
-    let url = `https://g.tenor.com/v1/search?q=${search}&key=${process.env.TENORKEY}&limit=10`;
+
+    let url = `https://g.tenor.com/v1/search?q=${search}&key=${process.env.TENOR_API_KEY}&limit=10`;
     let response = await fetch(url);
     let responsejson: any = await response.json();
 
