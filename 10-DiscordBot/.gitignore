@@ -1,4 +1,5 @@
 .env
 node_modules
 public/*
+!public/.gitkeep
 ts_cheat_sheet.ts

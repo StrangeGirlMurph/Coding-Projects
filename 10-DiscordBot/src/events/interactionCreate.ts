@@ -1,28 +1,14 @@
-import { Client, Interaction } from "discord.js";
+import { Interaction } from "discord.js";
+import { slashCommandHandler } from "../util/slashCommands";
 
 export default function (interaction: Interaction) {
-    console.log("Interaction created")
-    /* if (!interaction.isCommand()) return
-    if (!interaction.inGuild()) return interaction.reply("This command can only be used in a server")
+    if (!interaction.isCommand()) {
+        return;
+    }
 
-    const slashcmd = client.slashcommands.get(interaction.commandName)
+    if (!interaction.inGuild()) {
+        return interaction.reply({ content: `This command can only be used in a server.`, ephemeral: true });
+    }
 
-    if (!slashcmd) return interaction.reply("Invalid slash command")
-
-    if (slashcmd.perm && !interaction.member.permissions.has(slashcmd.perm))
-        return interaction.reply("You do not have permission for this command")
-
-    slashcmd.run(client, interaction)
-
-
-    // if (interaction.isCommand()) {
-    //     const cmd = commands.get(interaction.commandName);
-    //     if (!cmd) {
-    //         interaction.reply({ content: 'I\'m sorry an error occurred!', ephemeral: true });
-    //         return;
-    //     }
-    //     cmd.execute(client, interaction);
-    // } else {
-    //     interaction.reply({ content: `I'm sorry, an error occurred.`, ephemeral: true });
-    // } */
+    slashCommandHandler(interaction);
 }; 

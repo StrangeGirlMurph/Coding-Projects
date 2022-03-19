@@ -1,5 +1,5 @@
 import { Client, Message } from "discord.js";
-import { commands } from "../setup";
+import { commands } from "../init";
 import { getFiles } from "./getFiles";
 
 export async function textCommandLoader(client: Client) {
@@ -16,7 +16,12 @@ export async function textCommandLoader(client: Client) {
 }
 
 export function textCommandHandler(msg: Message, cmdName: string, args: string) {
-
     const execute = commands.textCommands[cmdName];
+
+    if (execute === undefined) {
+        //msg.reply("I don't know that command :(")
+        return
+    }
+
     execute(msg, args);
 }
