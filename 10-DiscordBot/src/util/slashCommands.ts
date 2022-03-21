@@ -1,4 +1,4 @@
-import { Client, CommandInteraction } from "discord.js";
+import { ApplicationCommandDataResolvable, Client, CommandInteraction } from "discord.js";
 import { commands } from "../init";
 import { client } from "../main";
 import { getFiles } from "./getFiles";
@@ -19,8 +19,7 @@ export interface slashCommandOption {
 }
 
 
-const toRegister: any[] = [];
-// const toRegister: slashCommandInfo[] = []; // this would be the correct type but that creates an error further down
+const toRegister: slashCommandInfo[] = [];
 
 export async function slashCommandLoader(client: Client) {
     const slashCommands = await getFiles("./src/commands/slashCommands/", "", "sample");
@@ -58,7 +57,7 @@ export async function slashCommandRegistration() {
         if (cmd === undefined) {
             // there is no command under the registered commands with the same name
             console.log(`Registering slash command: ${command.name}`);
-            await client.application.commands.create(command, guildId); // register it
+            await client.application.commands.create(command as ApplicationCommandDataResolvable, guildId); // register it
         } else {
             // there is a command with the same name
 
@@ -68,7 +67,7 @@ export async function slashCommandRegistration() {
             if (cmd.description !== command.description || JSON.stringify(cmd.options) !== JSON.stringify(command.options)) {
                 // the command is different
                 console.log(`Updating slash command: ${command.name}`);
-                await client.application.commands.edit(cmd.id, command, guildId);
+                await client.application.commands.edit(cmd.id, command as ApplicationCommandDataResolvable, guildId);
             }
         }
     }
