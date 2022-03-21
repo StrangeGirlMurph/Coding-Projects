@@ -20,6 +20,7 @@ export interface slashCommandOption {
 
 
 const toRegister: any[] = [];
+// const toRegister: slashCommandInfo[] = []; // this would be the correct type but that creates an error further down
 
 export async function slashCommandLoader(client: Client) {
     const slashCommands = await getFiles("./src/commands/slashCommands/", "", "sample");
