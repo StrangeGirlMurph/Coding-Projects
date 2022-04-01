@@ -6,30 +6,30 @@ let clearButton;
 
 function setup() {
 	canvas = createCanvas(400, 400);
+	pixelDensity(1);
 	background(255);
-	
+
 	inputImage = createGraphics(64, 64);
 	resultsDiv = createDiv('loading model...');
-	
+
 	clearButton = createButton('clear');
 	clearButton.mousePressed(function () {
 		background(255);
 	});
-		
-	pixelDensity(1);
+
 	let options = {
 		inputs: [64, 64, 4],
 		task: 'imageClassification'
 	};
-	
+
 	shapeClassifier = ml5.neuralNetwork(options);
-	
+
 	const modelDetails = {
 		model: '../model/model.json',
 		metadata: '../model/model_meta.json',
 		weights: '../model/model.weights.bin'
 	};
-	
+
 	shapeClassifier.load(modelDetails, modelLoaded);
 }
 
@@ -59,7 +59,7 @@ function gotResults(err, results) {
 	}
 
 	let label = results[0].label;
-	let confidence = nf(100 * results[0].confidence, 2, 0);
+	let confidence = nf(Math.floor(100 * results[0].confidence), 2, 0);
 
 	resultsDiv.html(`${label} ${confidence}%`);
 
