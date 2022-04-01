@@ -15,3 +15,5 @@ Many aren't finished at all and a total mess even I don't understand. Some on th
 | [08-Boids](08-Boids/)                                           | working version        |
 | [09-PiDay2022](09-Pi-Day2022/)                                  | done                   |
 | [10-DiscordBot](10-DiscordBot/)                                 | in progress            |
+| [11-MLShapeRecognition](11-MLShapeRecognition/)                 | in progress            |
+
