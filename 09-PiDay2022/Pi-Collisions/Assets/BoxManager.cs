@@ -1,29 +1,27 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
-using System;
 
 public class BoxManager : MonoBehaviour
 {
-    public int digits = 3;
-    public int TimesPerFixedTime = 1000;
-    public int numberOfCollisions = 0;
+    public uint numberOfDigits = 3;
+    public uint repetitionsPerFrame = 100;
+    public UInt64 numberOfCollisions = 0;
     public Box SmallBox;
     public Box BigBox;
-    float sumMass;
-    float m1, m2;
-    public GameObject wall;
-    float leftbound;
+    double sumMass;
+    double m1, m2;
+    public float leftboundXPosition;
     public AudioSource audioSource;
-    public Text texty;
+    public Text textComponent;
 
     void Awake()
     {
-        leftbound = wall.transform.position.x;
-
+        /* int zeros = (int)((numberOfDigits - 1) * 2);
         string num = "1";
-        num += new String('0', (digits - 1) * 2);
-        BigBox.mass = Convert.ToInt64(num);
-
+        num += new String('0', zeros);
+        BigBox.mass = Convert.ToSingle(num); */
+        BigBox.mass = Math.Pow(100, (double)(numberOfDigits - 1));
         m1 = SmallBox.mass;
         m2 = BigBox.mass;
         sumMass = m1 + m2;
@@ -31,27 +29,26 @@ public class BoxManager : MonoBehaviour
 
     void FixedUpdate()
     {
-        texty.text = numberOfCollisions.ToString();
+        textComponent.text = numberOfCollisions.ToString();
         collisionCheck();
     }
 
     void collisionCheck()
     {
-        for (int i = 0; i < TimesPerFixedTime; i++)
+        for (int i = 0; i < repetitionsPerFrame; i++)
         {
+            double SmallBoxleft = SmallBox.positionX - SmallBox.offset;
+            double SmallBoxright = SmallBox.positionX + SmallBox.offset;
 
-            float SmallBoxleft = SmallBox.positionX - SmallBox.offset;
-            float SmallBoxright = SmallBox.positionX + SmallBox.offset;
-
-            float BigBoxleft = BigBox.positionX - BigBox.offset;
-            float BigBoxRight = BigBox.positionX + BigBox.offset;
+            double BigBoxleft = BigBox.positionX - BigBox.offset;
+            double BigBoxRight = BigBox.positionX + BigBox.offset;
 
             if (SmallBoxright >= BigBoxleft & SmallBoxleft <= BigBoxRight)
             {
                 collisionWithBox();
                 numberOfCollisions++;
             }
-            if (SmallBoxleft <= leftbound)
+            if (SmallBoxleft <= leftboundXPosition)
             {
                 collisionWithWall(SmallBox);
                 numberOfCollisions++;
@@ -66,20 +63,19 @@ public class BoxManager : MonoBehaviour
 
     void collisionWithBox()
     {
-        float v1 = SmallBox.velocity;
-        float v2 = BigBox.velocity;
+        double v1 = SmallBox.velocity;
+        double v2 = BigBox.velocity;
 
         SmallBox.velocity = ((m1 - m2) / sumMass) * v1 + ((2 * m2) / sumMass) * v2;
         BigBox.velocity = ((2 * m1) / sumMass) * v1 + ((m2 - m1) / sumMass) * v2;
 
-        playSound();
+        //playSound();
     }
 
     void collisionWithWall(Box box)
     {
         box.velocity *= -1;
-
-        playSound();
+        //playSound();
     }
 
     void playSound()
