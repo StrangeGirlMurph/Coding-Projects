@@ -202,7 +202,7 @@ Transform:
   m_LocalPosition: {x: 0, y: -10, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 0}
   m_Children: []
-  m_Father: {fileID: 1444022386}
+  m_Father: {fileID: 1966976580}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &163868421
@@ -299,7 +299,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f172e749822661499afc1cb946d4376, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gText: {fileID: 163868423}
+  infoText: {fileID: 163868423}
 --- !u!1 &429156048
 GameObject:
   m_ObjectHideFlags: 0
@@ -426,7 +426,7 @@ GameObject:
   - component: {fileID: 957321186}
   - component: {fileID: 957321185}
   m_Layer: 0
-  m_Name: Arm
+  m_Name: Rod
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -494,7 +494,7 @@ Transform:
   m_LocalPosition: {x: 0, y: -5, z: 0}
   m_LocalScale: {x: 0.1, y: 10, z: 0}
   m_Children: []
-  m_Father: {fileID: 1444022386}
+  m_Father: {fileID: 1966976580}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1214231704
@@ -645,38 +645,6 @@ MonoBehaviour:
   m_FirstSelected: {fileID: 0}
   m_sendNavigationEvents: 1
   m_DragThreshold: 10
---- !u!1 &1444022385
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1444022386}
-  m_Layer: 0
-  m_Name: 1
-  m_TagString: Rod
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1444022386
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1444022385}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 957321186}
-  - {fileID: 112602571}
-  m_Father: {fileID: 1966976580}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1966976578
 GameObject:
   m_ObjectHideFlags: 0
@@ -706,12 +674,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67ab0df22fed2a143a2d3fae906536e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  g: 9.81
-  mass: 5
-  len: 1
-  startingAngleDeg: 70
-  angleDeg: 0
+  gravitationalAcceleration: 9.81
+  massBob: 1
+  lengthRod: 1
+  startingAngleDeg: 10
   resistance: 0.01
+  repetitionsPerFrame: 100
+  angleDeg: 0
 --- !u!4 &1966976580
 Transform:
   m_ObjectHideFlags: 0
@@ -723,7 +692,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 1444022386}
+  - {fileID: 957321186}
+  - {fileID: 112602571}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

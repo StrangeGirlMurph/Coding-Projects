@@ -6,8 +6,8 @@ using UnityEngine.UI;
 public class UI : MonoBehaviour
 {
     public Text infoText;
-    float gravitationalAcceleration;
-    int angleDeg;
+    float acceleration;
+    int angle;
     GameObject rod;
     Pendulum script;
 
@@ -19,8 +19,8 @@ public class UI : MonoBehaviour
 
     void Update()
     {
-        gravitationalAcceleration = script.gravitationalAcceleration;
-        angleDeg = (int)(script.angleDeg);
-        infoText.text = $"angle: {angleDeg} \ng: {gravitationalAcceleration}";
+        acceleration = script.gravitationalAcceleration;
+        angle = (int)(script.angleDeg);
+        infoText.text = $"angle: {angle} \ng: {acceleration}";
     }
 }
