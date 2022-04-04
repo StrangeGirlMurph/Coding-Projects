@@ -5,24 +5,22 @@ using UnityEngine.UI;
 
 public class UI : MonoBehaviour
 {
-    public Text gText;
-    float g;
-    int angle;
+    public Text infoText;
+    float gravitationalAcceleration;
+    int angleDeg;
     GameObject rod;
     Pendulum script;
 
-    // Start is called before the first frame update
     void Start()
     {
         rod = GameObject.Find("Pendulum");
         script = rod.GetComponent<Pendulum>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        g = script.g;
-        angle = (int)(script.angleDeg);
-        gText.text = $"angle: {angle} \ng: {g}";
+        gravitationalAcceleration = script.gravitationalAcceleration;
+        angleDeg = (int)(script.angleDeg);
+        infoText.text = $"angle: {angleDeg} \ng: {gravitationalAcceleration}";
     }
 }

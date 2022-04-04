@@ -6,24 +6,23 @@ using System;
 public class Pendulum : MonoBehaviour
 {
     // parameters
-    public float g = 9.81f;
-    public float mass = 5f;
-    public float len = 1f;
-   
-    public float startingAngleDeg = 70f;
-    public float angleDeg = 0;
-    float angle = 0f; // in rad
-    float angleA = 0f;
-    float angleV = 0f;
+    public float gravitationalAcceleration = 9.81f;
+    public float massBob = 5f;
+    public float lengthRod = 1f;
 
-    // 0 is no friction
-    public float resistance = 0.01f;
-    
+    public float startingAngleDeg = 70f;
+    [HideInInspector]
+    public float angleDeg = 0;
+    double angle = 0f; // radians
+    double angleV = 0f; // m/s
+    double angleA = 0f; // m/s^2
+    public float resistance = 0.01f; // 0 equals no friction
+
     void Start()
     {
-        angle = (float)(startingAngleDeg * Math.PI/180);
+        angle = (float)(startingAngleDeg * Math.PI / 180);
     }
-    
+
     void Update()
     {
         float deltatime;
@@ -37,27 +36,8 @@ public class Pendulum : MonoBehaviour
         transform.rotation = Quaternion.Euler(0f, 0f, angleDeg);
     }
 
-    float getAcceleration(float angle, float angleV)
+    double getAcceleration(double angle, double angleV)
     {
-        return -resistance * angleV - (float)((g / len) * Math.Sin(angle));
+        return -resistance * angleV - (gravitationalAcceleration / lengthRod) * Math.Sin(angle);
     }
-    
-    /*
-    void FixedUpdate()
-    {
-        float deltatime;
-        deltatime = Time.fixedDeltaTime;
-
-        angleA = getAcceleration(angle, angleV); 
-        angleV += angleA * deltatime;
-        angle += angleV * deltatime;
-        angleDeg = (float)(angle * 180 / Math.PI);
-
-        transform.rotation = Quaternion.Euler(0f, 0f, angleDeg);
-        if (angleDeg == 70)
-        {
-            Debug.Log(angleDeg);
-        }
-    } 
-    */
 }
