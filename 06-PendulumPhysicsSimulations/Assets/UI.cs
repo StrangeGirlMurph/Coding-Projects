@@ -9,12 +9,12 @@ public class UI : MonoBehaviour
     float acceleration;
     int angle;
     GameObject rod;
-    Pendulum script;
+    SinglePendulum script;
 
     void Start()
     {
         rod = GameObject.Find("Pendulum");
-        script = rod.GetComponent<Pendulum>();
+        script = rod.GetComponent<SinglePendulum>();
     }
 
     void Update()

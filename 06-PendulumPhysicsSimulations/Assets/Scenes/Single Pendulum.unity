@@ -677,7 +677,7 @@ MonoBehaviour:
   gravitationalAcceleration: 9.81
   massBob: 1
   lengthRod: 1
-  startingAngleDeg: 10
+  startingAngleDeg: 179
   resistance: 0.01
   repetitionsPerFrame: 100
   angleDeg: 0

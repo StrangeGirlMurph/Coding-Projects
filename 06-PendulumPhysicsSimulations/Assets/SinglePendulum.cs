@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class Pendulum : MonoBehaviour
+public class SinglePendulum : MonoBehaviour
 {
     // parameters
     public float gravitationalAcceleration = 9.81f;
@@ -32,6 +32,15 @@ public class Pendulum : MonoBehaviour
             angleA = getAcceleration(angle, angleV);
             angleV += angleA * fractionDeltatime;
             angle += angleV * fractionDeltatime;
+        }
+
+        if (angle > Math.PI)
+        {
+            angle = -(2 * Math.PI - angle);
+        }
+        else if (angle < -Math.PI)
+        {
+            angle = (2 * Math.PI + angle);
         }
 
         angleDeg = (float)(angle * 180 / Math.PI);
