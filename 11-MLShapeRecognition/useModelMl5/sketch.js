@@ -25,9 +25,9 @@ function setup() {
 	shapeClassifier = ml5.neuralNetwork(options);
 
 	const modelDetails = {
-		model: '../model/model.json',
-		metadata: '../model/model_meta.json',
-		weights: '../model/model.weights.bin'
+		model: '../models/model.json',
+		metadata: '../models/model_meta.json',
+		weights: '../models/model.weights.bin'
 	};
 
 	shapeClassifier.load(modelDetails, modelLoaded);
