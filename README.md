@@ -13,7 +13,7 @@ Many aren't finished at all and a total mess even I don't understand. Some on th
 | [06-PendulumPhysicsSimulations](06-PendulumPhysicsSimulations/) | working version        |
 | [07-AdventOfCode2021](07-AdventOfCode2021/)                     | mostly done            |
 | [08-Boids](08-Boids/)                                           | working version        |
-| [09-PiDay2022](09-Pi-Day2022/)                                  | done                   |
+| [09-PiDay2022](09-PiDay2022/)                                  | done                   |
 | [10-DiscordBot](10-DiscordBot/)                                 | in progress            |
 | [11-MLShapeRecognition](11-MLShapeRecognition/)                 | in progress            |
 
