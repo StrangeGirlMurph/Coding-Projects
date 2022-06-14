@@ -13,8 +13,7 @@ import time
 # - press r to reset the grid with new random values
 
 # colors
-random_color = (random.randint(
-    1, 254), random.randint(1, 254), random.randint(0, 254))
+random_color = (random.randint(1, 254), random.randint(1, 254), random.randint(0, 254))
 green = (67, 245, 94, 96)
 light_green = (207, 255, 171)
 black = (0, 0, 0)
@@ -27,8 +26,17 @@ grey = (196, 195, 190)
 # see for yourself what you can edit here
 # wrap around means the opposing edges of the grid are connected
 # the alternative is that the cells beyond the border are always treated as if they were dead
-conway = GameofLife(random=True, cell_size=10, rows=80,
-                    columns=140, wrap_around=True, line_thickness=1, background_color=white, line_color=grey, cell_color=green)
+conway = GameofLife(
+    random=True,
+    cell_size=11,
+    rows=80,
+    columns=140,
+    wrap_around=True,
+    line_thickness=1,
+    background_color=black,
+    line_color=(40, 40, 40),
+    cell_color=white,
+)
 
 tickrate = 10
 
@@ -80,8 +88,8 @@ def main():
 
         if play:
             # copied from Lentil#1133
-            if time.perf_counter() > t0 + 1/tickrate:
-                t0 += 1/tickrate
+            if time.perf_counter() > t0 + 1 / tickrate:
+                t0 += 1 / tickrate
                 conway.run()
     pg.quit()
 
