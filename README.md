@@ -1,18 +1,24 @@
 # Coding-Projects
+
 This Repository contains all the coding projects I stumbled upon in my everyday life or that I created at Hackathons or Game Jams in which I participated.
 Many aren't finished at all and a total mess even I don't understand. Some on the other hand are cool.
 
 ## Status
+
+- ✅ I got a working version done but I am probably not happy with it. There are always a billion things to do better.
+- ♾️ Work in progress... Probably for ever...
+- ⛔ Neither finished nor am I working on it...
+
 | Project                                                         | Status                 |
 | --------------------------------------------------------------- | ---------------------- |
-| [01-MathRiddle](01-MathRiddle/)                                 | on halt (not finished) |
-| [02-ConwaysGameOfLife](02-ConwaysGameOfLife/)                   | working version        |
-| [03-CollatzConjecture](03-CollatzConjecture/)                   | working version        |
-| [04-MusicVisualizer](04-MusicVisualizer/)                       | working version        |
-| [05-Game+AI](05-Game+AI/)                                       | on halt (not finished) |
-| [06-PendulumPhysicsSimulations](06-PendulumPhysicsSimulations/) | working version        |
-| [07-AdventOfCode2021](07-AdventOfCode2021/)                     | mostly done            |
-| [08-Boids](08-Boids/)                                           | working version        |
-| [09-PiDay2022](09-PiDay2022/)                                  | done                   |
-| [10-DiscordBot](10-DiscordBot/)                                 | in progress            |
-| [11-MLShapeRecognition](11-MLShapeRecognition/)                 | in progress            |
+| [01-MathRiddle](01-MathRiddle/)                                 | ⛔ |
+| [02-ConwaysGameOfLife](02-ConwaysGameOfLife/)                   | ✅        |
+| [03-CollatzConjecture](03-CollatzConjecture/)                   | ✅        |
+| [04-MusicVisualizer](04-MusicVisualizer/)                       | ✅        |
+| [05-Game+AI](05-Game+AI/)                                       | ⛔ |
+| [06-PendulumPhysicsSimulations](06-PendulumPhysicsSimulations/) | ♾️        |
+| [07-AdventOfCode2021](07-AdventOfCode2021/)                     | ✅           |
+| [08-Boids](08-Boids/)                                           | ✅        |
+| [09-PiDay2022](09-PiDay2022/)                                   | ✅                   |
+| [10-DiscordBot](10-DiscordBot/)                                 | ⛔            |
+| [11-MLShapeRecognition](11-MLShapeRecognition/)                 | ⛔            |
