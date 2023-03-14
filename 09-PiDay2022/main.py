@@ -14,10 +14,7 @@ import numpy as np
 def coprime(a, b):
     while b != 0:
         a, b = b, a % b
-    if a == 1:
-        return True
-    else:
-        return False
+    return a == 1
 
 
 def estimatePi(random=PythonRandom, num=10000000):
