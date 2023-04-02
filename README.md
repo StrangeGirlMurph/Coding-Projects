@@ -11,14 +11,15 @@ Many aren't finished at all and a total mess even I don't understand. Some on th
 
 | Project                                                         | Status |
 | --------------------------------------------------------------- | ------ |
-| [01-MathRiddle](01-MathRiddle/)                                 | ⛔     |
-| [02-ConwaysGameOfLife](02-ConwaysGameOfLife/)                   | ✅     |
-| [03-CollatzConjecture](03-CollatzConjecture/)                   | ✅     |
-| [04-MusicVisualizer](04-MusicVisualizer/)                       | ✅     |
-| [05-Game+AI](05-Game+AI/)                                       | ⛔     |
+| [01-MathRiddle](01-MathRiddle/)                                 | ⛔      |
+| [02-ConwaysGameOfLife](02-ConwaysGameOfLife/)                   | ✅      |
+| [03-CollatzConjecture](03-CollatzConjecture/)                   | ✅      |
+| [04-MusicVisualizer](04-MusicVisualizer/)                       | ✅      |
+| [05-Game+AI](05-Game+AI/)                                       | ⛔      |
 | [06-PendulumPhysicsSimulations](06-PendulumPhysicsSimulations/) | ♾️      |
-| [07-AdventOfCode2021](07-AdventOfCode2021/)                     | ✅     |
-| [08-Boids](08-Boids/)                                           | ✅     |
-| [09-PiDay2022](09-PiDay2022/)                                   | ✅     |
-| [10-DiscordBot](10-DiscordBot/)                                 | ⛔     |
-| [11-MLShapeRecognition](11-MLShapeRecognition/)                 | ⛔     |
+| [07-AdventOfCode2021](07-AdventOfCode2021/)                     | ✅      |
+| [08-Boids](08-Boids/)                                           | ✅      |
+| [09-PiDay2022](09-PiDay2022/)                                   | ✅      |
+| [10-DiscordBot](10-DiscordBot/)                                 | ⛔      |
+| [11-MLShapeRecognition](11-MLShapeRecognition/)                 | ⛔      |
+| [12-PiDay2023](12-PiDay2023/)                                   | ✅      |

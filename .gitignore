@@ -3,3 +3,5 @@
 __pycache__
 source
 target
+node_modules
+.env
