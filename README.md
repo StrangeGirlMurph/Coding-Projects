@@ -4,20 +4,20 @@ This Repository contains all the coding projects I stumbled upon in my everyday 
 
 ## Status
 
-- ✅ I got at least some kind of a working version done but I am probably not happy with it. There are always a billion things to do better. At this point I just stoped working on it.
-- ⛔ Neither finished nor am I working on it...
+✅: I got at least some kind of a working version done but I am probably not happy with it. There are always a billion things to do better. At this point I just stoped working on it.  
+⛔: Neither finished nor am I working on it...
 
 | Projects (**sorted by relevance!**) | Status |
 | ----------------------------------- | ------ |
-| ILikePi                             | ✅      |
-| CollatzConjecture                   | ✅      |
-| AdventOfCode                        | ✅      |
-| ConwaysGameOfLife                   | ✅      |
-| MusicVisualizer                     | ✅      |
-| Boids                               | ✅      |
-| MachineLearning                     | ✅      |
-| PendulumPhysicsSimulations          | ⛔      |
-| Game+AI                             | ⛔      |
-| DiscordBot                          | ⛔      |
-| MathRiddle                          | ⛔      |
-| FunctionGraphs                      | ⛔      |
+| ILikePi                             | ✅     |
+| CollatzConjecture                   | ✅     |
+| AdventOfCode                        | ✅     |
+| ConwaysGameOfLife                   | ✅     |
+| MusicVisualizer                     | ✅     |
+| Boids                               | ✅     |
+| MachineLearning                     | ✅     |
+| PendulumPhysicsSimulations          | ⛔     |
+| Game+AI                             | ⛔     |
+| DiscordBot                          | ⛔     |
+| MathRiddle                          | ⛔     |
+| FunctionGraphs                      | ⛔     |
