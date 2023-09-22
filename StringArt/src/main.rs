@@ -1,23 +1,25 @@
 pub mod lines;
 pub mod utils;
 
-use lines::draw_line;
+use lines::calculate_line;
 use minifb::{Key, ScaleMode, Window, WindowOptions};
+use ndarray::{concatenate, s, Array1, Array2, Axis, Order, Zip};
 use rayon::prelude::*;
-use utils::{extract_rgb, grayscale, rgb, Pixel};
+use utils::{blend_colors, extract_rgb, grayscale, load_image, plot, Position};
 
-const NODE_SPACING: usize = 8; // number of pixels between nodes
-const ROUGH_HEIGHT: usize = 400; // roughly the height of the image
+const NODES: usize = 480; // number of nodes (must be divisible by 4) (and pls don't make it divisible by 3 okay byeee)
+const MAX_SIZE: usize = 300; // height and width of the image
 
 fn main() {
     // Load image
-    let (image, width, height) = load_image("resources/road.jpg");
+    let image = load_image("resources/cat.png");
+    let size = image.dim().0;
 
     // Drawing
     let mut window = Window::new(
         "String Art - Press ESC to exit",
-        width as usize,
-        height as usize,
+        2 * size,
+        size,
         WindowOptions {
             resize: true,
             scale_mode: ScaleMode::Center,
@@ -27,110 +29,131 @@ fn main() {
     .expect("Unable to create window :(");
 
     // Limit to max ~60 fps update rate
-    window.limit_update_rate(Some(std::time::Duration::from_micros(16600)));
+    //window.limit_update_rate(Some(std::time::Duration::from_micros(16600)));
 
     // Computation
-    let mut canvas: Vec<Vec<u32>> = vec![vec![grayscale(0.0); width]; height];
+    let mut nodes: [Position; NODES] = [Position { x: 0.0, y: 0.0 }; NODES];
+    for (i, val) in Array1::<f64>::linspace(0.0, 1.0, NODES / 4 + 1)
+        .slice(s![0..-1i32])
+        .iter()
+        .enumerate()
+    {
+        nodes[i * 4] = Position { x: *val, y: 0.0 };
+        nodes[i * 4 + 1] = Position { x: 1.0, y: *val };
+        nodes[i * 4 + 2] = Position {
+            x: 1.0 - *val,
+            y: 1.0,
+        };
+        nodes[i * 4 + 3] = Position {
+            x: 0.0,
+            y: 1.0 - *val,
+        };
+    }
 
-    let mut nodes: Vec<Pixel> = Vec::new();
-    for x in [0, width] {
-        for y in (0..=height).step_by(NODE_SPACING) {
-            nodes.push(Pixel { x, y });
-        }
-    }
-    for y in [0, height] {
-        for x in (NODE_SPACING..=width - NODE_SPACING).step_by(NODE_SPACING) {
-            nodes.push(Pixel { x, y });
-        }
-    }
+    let mut canvas: Array2<u32> = Array2::from_elem((size, size), grayscale(0.0));
+    let color = grayscale(1.0);
+    let alpha = 0.3;
 
     let mut previous = 0;
     let mut current = 0;
 
     while window.is_open() && !window.is_key_down(Key::Escape) && !window.is_key_down(Key::Q) {
-        let mut best: (usize, f64, Vec<Vec<u32>>) = (0, f64::INFINITY, vec![vec![]]);
+        let distance_map = distance_map(&image, &canvas);
+
+        let mut best: (usize, f64, Array2<bool>, Array2<f64>) = (
+            0,
+            f64::INFINITY,
+            Array2::default((0, 0)),
+            Array2::default((0, 0)),
+        );
+
         for (index, node) in nodes.iter().enumerate() {
             if index == current
                 || index == previous
                 || (nodes[current].x == node.x
-                    && nodes[current].x % width == 0
-                    && node.x % width == 0)
+                    && nodes[current].x % 1.0 == 0.0
+                    && node.x % 1.0 == 0.0)
                 || (nodes[current].y == node.y
-                    && nodes[current].y % height == 0
-                    && node.y % height == 0)
+                    && nodes[current].y % 1.0 == 0.0
+                    && node.y % 1.0 == 0.0)
             {
                 continue;
             }
 
-            let mut clone = canvas.clone();
-            let touched = draw_line(&mut clone, nodes[current], *node, grayscale(1.0), 0.4);
-            //for pixel in touched {}
+            let (alpha_mask, boolean_mask) =
+                calculate_line(&canvas.raw_dim(), nodes[current].mul(size), node.mul(size));
+            let diff = calculate_distance(
+                &distance_map,
+                &image,
+                &canvas,
+                &boolean_mask,
+                &alpha_mask,
+                color,
+                alpha,
+            );
+            //println!("{} -> {} | {}", current, index, diff);
 
-            let diff = distance(&image, &flatten(&clone));
             if diff < best.1 {
-                //println!("New best: {:?}", node);
-                best = (index, diff, clone);
+                best = (index, diff, boolean_mask, alpha_mask);
             }
         }
 
-        //println!("{} - {}", best.1, distance(&image, &flatten(&canvas)));
-        /* if best.1 >= distance(&image, &flatten(&canvas)) {
-            break;
-        } */
-
+        //println!("{} {}", nodes[current].x, nodes[current].y);
         previous = current;
         current = best.0;
-        canvas = best.2;
+        plot(&mut canvas, &best.2, &best.3, color, alpha);
+
+        let concatenated = concatenate(Axis(1), &[image.view(), canvas.view()]).unwrap();
+        let concatenated = concatenated
+            .to_shape(((2 * size * size), Order::RowMajor))
+            .unwrap()
+            .to_vec();
 
         window
-            .update_with_buffer(&flatten(&canvas), width as usize, height as usize)
+            .update_with_buffer(&concatenated, 2 * size, size)
             .unwrap();
     }
 }
 
-fn distance(v1: &Vec<u32>, v2: &Vec<u32>) -> f64 {
-    (v1.par_iter()
-        .zip(v2.par_iter())
-        .map(|(&x, &y)| {
-            let (r0, g0, b0) = extract_rgb(x);
-            let (r1, g1, b1) = extract_rgb(y);
-            r0.abs_diff(r1) as u64 + g0.abs_diff(g1) as u64 + b0.abs_diff(b1) as u64
+fn calculate_distance(
+    distance_map: &Array2<usize>,
+    image: &Array2<u32>,
+    canvas: &Array2<u32>,
+    boolean_mask: &Array2<bool>,
+    alpha_mask: &Array2<f64>,
+    color: u32,
+    alpha: f64,
+) -> f64 {
+    Zip::from(distance_map)
+        .and(boolean_mask)
+        .into_par_iter()
+        .filter(|(_, boolean)| !**boolean)
+        .map(|(distance, _)| *distance as f64)
+        .sum::<f64>()
+        + Zip::from(image)
+            .and(canvas)
+            .and(alpha_mask)
+            .and(boolean_mask)
+            .into_par_iter()
+            .filter(|(_, _, _, boolean)| **boolean)
+            .map(|(image_pixel, canvas_pixel, alpha_pixel, _)| {
+                let reference = *image_pixel;
+                let new = blend_colors(*canvas_pixel, color, *alpha_pixel * alpha);
+                let (r0, g0, b0) = extract_rgb(reference);
+                let (r1, g1, b1) = extract_rgb(new);
+                (r0.abs_diff(r1) as f64).powf(1.0)
+                    + (g0.abs_diff(g1) as f64).powf(1.0)
+                    + (b0.abs_diff(b1) as f64).powf(1.0)
+            })
+            .sum::<f64>()
+}
+
+fn distance_map(image: &Array2<u32>, canvas: &Array2<u32>) -> Array2<usize> {
+    Zip::from(image)
+        .and(canvas)
+        .map_collect(|image_pixel, canvas_pixel| {
+            let (r0, g0, b0) = extract_rgb(*image_pixel);
+            let (r1, g1, b1) = extract_rgb(*canvas_pixel);
+            (r0.abs_diff(r1) as usize) + (g0.abs_diff(g1) as usize) + (b0.abs_diff(b1) as usize)
         })
-        .sum::<u64>() as f64)
-        .sqrt()
-}
-
-fn flatten(vec: &Vec<Vec<u32>>) -> Vec<u32> {
-    vec.clone().into_par_iter().flatten().collect()
-}
-
-fn load_image(path: &str) -> (Vec<u32>, usize, usize) {
-    let mut img = image::open(path).expect("Failed to open image");
-    println!("Image size: {}x{}", img.width(), img.height());
-    img = img.resize(
-        (ROUGH_HEIGHT + ROUGH_HEIGHT % NODE_SPACING) as u32,
-        (ROUGH_HEIGHT + ROUGH_HEIGHT % NODE_SPACING) as u32,
-        image::imageops::FilterType::Triangle,
-    );
-    img = img.crop(
-        img.width() % NODE_SPACING as u32 / 2,
-        img.height() % NODE_SPACING as u32 / 2,
-        img.width() - img.width() % NODE_SPACING as u32,
-        img.height() - img.height() % NODE_SPACING as u32,
-    );
-
-    let (width, height) = (img.width() as usize, img.height() as usize);
-    let image: Vec<u32> = img
-        .grayscale()
-        .to_rgb8()
-        .enumerate_pixels()
-        .map(|(_, _, p)| rgb(p[0], p[1], p[2]))
-        .collect();
-
-    println!(
-        "Image size after scaling and cropping: {}x{}",
-        width, height
-    );
-
-    (image, width, height)
 }
