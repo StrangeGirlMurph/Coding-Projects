@@ -46,7 +46,7 @@ pub fn grayscale(value: f64) -> u32 {
     rgb(value, value, value)
 }
 
-use crate::MAX_SIZE;
+use crate::{MAX_SIZE, MIN_SIZE};
 
 pub fn load_image(path: &str) -> Array2<u32> {
     let mut img = image::open(path).expect("Failed to open image");
@@ -55,10 +55,18 @@ pub fn load_image(path: &str) -> Array2<u32> {
     let min = u32::min(img.height(), img.width());
     img = img.crop(img.width() % min / 2, img.height() % min / 2, min, min);
 
-    if img.width() as usize > MAX_SIZE {
+    if (img.width() as usize) > MAX_SIZE {
         img = img.resize(
             MAX_SIZE as u32,
             MAX_SIZE as u32,
+            image::imageops::FilterType::Triangle,
+        );
+    }
+
+    if (img.width() as usize) < MIN_SIZE && MAX_SIZE > MIN_SIZE {
+        img = img.resize(
+            MIN_SIZE as u32,
+            MIN_SIZE as u32,
             image::imageops::FilterType::Triangle,
         );
     }

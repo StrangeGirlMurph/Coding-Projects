@@ -8,11 +8,13 @@ use rayon::prelude::*;
 use utils::{blend_colors, extract_rgb, grayscale, load_image, plot, Position};
 
 const NODES: usize = 480; // number of nodes (must be divisible by 4) (and pls don't make it divisible by 3 okay byeee)
-const MAX_SIZE: usize = 300; // height and width of the image
+const MAX_SIZE: usize = 400; // maximum height and width of the image
+const MIN_SIZE: usize = 300; // minimum height and width of the image
+const ALPHA: f64 = 0.08; // alpha value for the lines
 
 fn main() {
     // Load image
-    let image = load_image("resources/cat.png");
+    let image = load_image("resources/road.jpg");
     let size = image.dim().0;
 
     // Drawing
@@ -52,7 +54,6 @@ fn main() {
 
     let mut canvas: Array2<u32> = Array2::from_elem((size, size), grayscale(0.0));
     let color = grayscale(1.0);
-    let alpha = 0.3;
 
     let mut previous = 0;
     let mut current = 0;
@@ -89,7 +90,7 @@ fn main() {
                 &boolean_mask,
                 &alpha_mask,
                 color,
-                alpha,
+                ALPHA,
             );
             //println!("{} -> {} | {}", current, index, diff);
 
@@ -101,7 +102,7 @@ fn main() {
         //println!("{} {}", nodes[current].x, nodes[current].y);
         previous = current;
         current = best.0;
-        plot(&mut canvas, &best.2, &best.3, color, alpha);
+        plot(&mut canvas, &best.2, &best.3, color, ALPHA);
 
         let concatenated = concatenate(Axis(1), &[image.view(), canvas.view()]).unwrap();
         let concatenated = concatenated

@@ -1,6 +1,7 @@
 use crate::utils::Position;
 use ndarray::{Array2, Dim};
 
+/// <https://en.wikipedia.org/wiki/Xiaolin_Wu%27s_line_algorithm>
 pub fn calculate_line(
     canvas_shape: &Dim<[usize; 2]>,
     start: Position,
