@@ -1,71 +1,15 @@
-use nannou::prelude::*;
-use rayon::prelude::*;
+use cell::{Border, Cell, Direction};
+use nannou::{
+    prelude::*,
+    rand::{self, seq::SliceRandom},
+};
+pub mod cell;
 
 const MAZE_DIM: usize = 100;
 const WINDOW_DIM: u32 = 1000;
 const PADDING: u32 = 10;
 
 const CELL_SIZE: f32 = (WINDOW_DIM - PADDING * 2) as f32 / MAZE_DIM as f32;
-
-#[derive(Clone, Copy)]
-struct Cell {
-    pub data: u8,
-}
-
-impl Cell {
-    fn new() -> Self {
-        Cell { data: 0 }
-    }
-
-    fn random() -> Self {
-        Cell {
-            data: random_range(0, 16),
-        }
-    }
-
-    fn borders((top, right, bottom, left): (bool, bool, bool, bool)) -> Self {
-        let mut data = 0;
-        if top {
-            data |= 8;
-        }
-        if right {
-            data |= 4;
-        }
-        if bottom {
-            data |= 2;
-        }
-        if left {
-            data |= 1;
-        }
-
-        Cell { data }
-    }
-
-    fn get_borders(&self) -> (bool, bool, bool, bool) {
-        (
-            self.data & 8 == 0,
-            self.data & 4 == 0,
-            self.data & 2 == 0,
-            self.data & 1 == 0,
-        )
-    }
-
-    fn set_borders(&mut self, (top, right, bottom, left): (bool, bool, bool, bool)) {
-        self.data = 0;
-        if top {
-            self.data |= 8;
-        }
-        if right {
-            self.data |= 4;
-        }
-        if bottom {
-            self.data |= 2;
-        }
-        if left {
-            self.data |= 1;
-        }
-    }
-}
 
 fn main() {
     nannou::app(model)
@@ -80,7 +24,45 @@ struct Model {
 }
 
 fn model(_app: &App) -> Model {
-    let maze = [Cell::new(); MAZE_DIM * MAZE_DIM].map(|_| Cell::random());
+    let mut maze = [Cell::new(); MAZE_DIM * MAZE_DIM];
+
+    // Generate maze
+    for i in 0..MAZE_DIM {
+        maze[i].add_border(Border::Top);
+        maze[i * MAZE_DIM + MAZE_DIM - 1].add_border(Border::Right);
+        maze[MAZE_DIM * MAZE_DIM - MAZE_DIM + i].add_border(Border::Bottom);
+        maze[i * MAZE_DIM].add_border(Border::Left);
+    }
+
+    let mut stack = vec![0];
+    maze[0].toggle_visited();
+    while stack.len() > 0 {
+        let position = stack.last().unwrap().clone();
+
+        let directions = maze[position].get_possibile_directions();
+        let dir = directions
+            .into_iter()
+            .filter(|dir| !maze[(position as isize + dir.index_step()) as usize].is_visited())
+            .collect::<Vec<Direction>>();
+        let dir = dir.choose(&mut rand::thread_rng());
+
+        if dir.is_some() {
+            let dir = dir.unwrap();
+            let next = (position as isize + dir.index_step()) as usize;
+
+            maze[next].toggle_visited();
+            stack.push(next);
+            let options = maze[position].get_possibile_directions();
+            for option in options {
+                if !stack.contains(&((position as isize + option.index_step()) as usize)) {
+                    maze[position].add_border(option.border());
+                }
+            }
+        } else {
+            stack.pop();
+        }
+    }
+
     Model { maze }
 }
 
@@ -89,48 +71,52 @@ fn update(_app: &App, _model: &mut Model, _update: Update) {}
 fn view(app: &App, model: &Model, frame: Frame) {
     let background_color = hsl(0.0, 0.0, 0.02);
     let line_color = hsl(0.0, 0.0, 0.4);
-    let weight = CELL_SIZE * 0.1;
+    let weight = 2.0.min(CELL_SIZE * 0.1);
 
     let draw = app.draw();
     draw.background().color(background_color);
 
     // Draw the maze
     for (i, cell) in model.maze.iter().enumerate() {
-        let x = (i % MAZE_DIM) as f32 * CELL_SIZE + PADDING as f32 - (WINDOW_DIM / 2) as f32
-            + CELL_SIZE / 2.0;
-        let y = (i / MAZE_DIM) as f32 * CELL_SIZE + PADDING as f32 - (WINDOW_DIM / 2) as f32
-            + CELL_SIZE / 2.0;
+        let half_cell_size = CELL_SIZE / 2.0;
+        let half_window_size = (WINDOW_DIM / 2) as f32;
 
-        let half = CELL_SIZE / 2.0;
-        let (top, right, bottom, left) = cell.get_borders();
+        let x =
+            (i % MAZE_DIM) as f32 * CELL_SIZE + PADDING as f32 - half_window_size + half_cell_size;
+        let y = -1.0 * (i / MAZE_DIM) as f32 * CELL_SIZE - PADDING as f32 + half_window_size
+            - half_cell_size;
 
-        if top {
-            draw.line()
-                .start(pt2(x - half, y + half))
-                .end(pt2(x + half, y + half))
-                .color(line_color)
-                .weight(weight);
-        }
-        if right {
-            draw.line()
-                .start(pt2(x + half, y + half))
-                .end(pt2(x + half, y - half))
-                .color(line_color)
-                .weight(weight);
-        }
-        if bottom {
-            draw.line()
-                .start(pt2(x + half, y - half))
-                .end(pt2(x - half, y - half))
-                .color(line_color)
-                .weight(weight);
-        }
-        if left {
-            draw.line()
-                .start(pt2(x - half, y - half))
-                .end(pt2(x - half, y + half))
-                .color(line_color)
-                .weight(weight);
+        for border in cell.get_borders() {
+            match border {
+                Border::Top => {
+                    draw.line()
+                        .start(pt2(x - half_cell_size, y + half_cell_size))
+                        .end(pt2(x + half_cell_size, y + half_cell_size))
+                        .color(line_color)
+                        .weight(weight);
+                }
+                Border::Right => {
+                    draw.line()
+                        .start(pt2(x + half_cell_size, y + half_cell_size))
+                        .end(pt2(x + half_cell_size, y - half_cell_size))
+                        .color(line_color)
+                        .weight(weight);
+                }
+                Border::Bottom => {
+                    draw.line()
+                        .start(pt2(x + half_cell_size, y - half_cell_size))
+                        .end(pt2(x - half_cell_size, y - half_cell_size))
+                        .color(line_color)
+                        .weight(weight);
+                }
+                Border::Left => {
+                    draw.line()
+                        .start(pt2(x - half_cell_size, y - half_cell_size))
+                        .end(pt2(x - half_cell_size, y + half_cell_size))
+                        .color(line_color)
+                        .weight(weight);
+                }
+            }
         }
     }
 
