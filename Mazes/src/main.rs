@@ -1,9 +1,9 @@
-use cell::{Border, Cell, Direction};
 use nannou::{
     prelude::*,
     rand::{self, seq::SliceRandom},
 };
-pub mod cell;
+use structs::{Border, CellPosition, Direction, Maze};
+pub mod structs;
 
 const MAZE_DIM: usize = 100;
 const WINDOW_DIM: u32 = 1000;
@@ -13,6 +13,9 @@ const CELL_SIZE: f32 = (WINDOW_DIM - PADDING * 2) as f32 / MAZE_DIM as f32;
 
 fn main() {
     nannou::app(model)
+        /* .loop_mode(LoopMode::Rate {
+            update_interval: Duration::from_millis(1000), // currently not working
+        }) */
         .update(update)
         .simple_window(view)
         .size(WINDOW_DIM, WINDOW_DIM)
@@ -20,48 +23,54 @@ fn main() {
 }
 
 struct Model {
-    maze: [Cell; MAZE_DIM * MAZE_DIM],
+    maze: Maze,
 }
 
 fn model(_app: &App) -> Model {
-    let mut maze = [Cell::new(); MAZE_DIM * MAZE_DIM];
+    let mut maze = Maze::new_with_borders();
+    let start = CellPosition { x: 0, y: 0 };
+    let end = CellPosition {
+        x: MAZE_DIM as isize - 1,
+        y: MAZE_DIM as isize - 1,
+    };
 
-    // Generate maze
-    for i in 0..MAZE_DIM {
-        maze[i].add_border(Border::Top);
-        maze[i * MAZE_DIM + MAZE_DIM - 1].add_border(Border::Right);
-        maze[MAZE_DIM * MAZE_DIM - MAZE_DIM + i].add_border(Border::Bottom);
-        maze[i * MAZE_DIM].add_border(Border::Left);
-    }
+    let mut stack = vec![start];
+    maze.cell(&start).unwrap().toggle_visited();
 
-    let mut stack = vec![0];
-    maze[0].toggle_visited();
-    while stack.len() > 0 {
-        let position = stack.last().unwrap().clone();
+    while stack.len() != 0 {
+        let position = stack.pop().unwrap();
 
-        let directions = maze[position].get_possibile_directions();
-        let dir = directions
+        let directions = Direction::all()
             .into_iter()
-            .filter(|dir| !maze[(position as isize + dir.index_step()) as usize].is_visited())
-            .collect::<Vec<Direction>>();
-        let dir = dir.choose(&mut rand::thread_rng());
-
-        if dir.is_some() {
-            let dir = dir.unwrap();
-            let next = (position as isize + dir.index_step()) as usize;
-
-            maze[next].toggle_visited();
-            stack.push(next);
-            let options = maze[position].get_possibile_directions();
-            for option in options {
-                if !stack.contains(&((position as isize + option.index_step()) as usize)) {
-                    maze[position].add_border(option.border());
+            .filter(|direction| {
+                let target = maze.read_cell(&position.move_in_direction(direction));
+                match target.is_some() {
+                    true => !target.unwrap().is_visited(),
+                    false => false,
                 }
-            }
-        } else {
-            stack.pop();
+            })
+            .collect::<Vec<Direction>>();
+
+        if !directions.is_empty() {
+            let direction = directions.choose(&mut rand::thread_rng()).unwrap();
+
+            maze.cell_in_direction(&position, direction)
+                .unwrap()
+                .toggle_visited();
+
+            stack.push(position);
+            stack.push(position.move_in_direction(direction));
+            maze.cell(&position)
+                .unwrap()
+                .remove_border(&direction.border());
+            maze.cell(&position.move_in_direction(direction))
+                .unwrap()
+                .remove_border(&direction.reverse().border());
         }
     }
+
+    maze.cell(&start).unwrap().remove_border(&Border::Top);
+    maze.cell(&end).unwrap().remove_border(&Border::Bottom);
 
     Model { maze }
 }
@@ -77,44 +86,47 @@ fn view(app: &App, model: &Model, frame: Frame) {
     draw.background().color(background_color);
 
     // Draw the maze
-    for (i, cell) in model.maze.iter().enumerate() {
-        let half_cell_size = CELL_SIZE / 2.0;
-        let half_window_size = (WINDOW_DIM / 2) as f32;
+    let half_cell_size = CELL_SIZE / 2.0;
+    let half_window_size = (WINDOW_DIM / 2) as f32;
 
-        let x =
-            (i % MAZE_DIM) as f32 * CELL_SIZE + PADDING as f32 - half_window_size + half_cell_size;
-        let y = -1.0 * (i / MAZE_DIM) as f32 * CELL_SIZE - PADDING as f32 + half_window_size
-            - half_cell_size;
+    for x in 0..MAZE_DIM {
+        for y in 0..MAZE_DIM {
+            let cell = model.maze.read_cell_by_xy(&(x, y));
 
-        for border in cell.get_borders() {
-            match border {
-                Border::Top => {
-                    draw.line()
-                        .start(pt2(x - half_cell_size, y + half_cell_size))
-                        .end(pt2(x + half_cell_size, y + half_cell_size))
-                        .color(line_color)
-                        .weight(weight);
-                }
-                Border::Right => {
-                    draw.line()
-                        .start(pt2(x + half_cell_size, y + half_cell_size))
-                        .end(pt2(x + half_cell_size, y - half_cell_size))
-                        .color(line_color)
-                        .weight(weight);
-                }
-                Border::Bottom => {
-                    draw.line()
-                        .start(pt2(x + half_cell_size, y - half_cell_size))
-                        .end(pt2(x - half_cell_size, y - half_cell_size))
-                        .color(line_color)
-                        .weight(weight);
-                }
-                Border::Left => {
-                    draw.line()
-                        .start(pt2(x - half_cell_size, y - half_cell_size))
-                        .end(pt2(x - half_cell_size, y + half_cell_size))
-                        .color(line_color)
-                        .weight(weight);
+            let x = x as f32 * CELL_SIZE + PADDING as f32 - half_window_size + half_cell_size;
+            let y =
+                -1.0 * y as f32 * CELL_SIZE - PADDING as f32 + half_window_size - half_cell_size;
+
+            for border in cell.unwrap().get_borders() {
+                match border {
+                    Border::Top => {
+                        draw.line()
+                            .start(pt2(x - half_cell_size, y + half_cell_size))
+                            .end(pt2(x + half_cell_size, y + half_cell_size))
+                            .color(line_color)
+                            .weight(weight);
+                    }
+                    Border::Right => {
+                        draw.line()
+                            .start(pt2(x + half_cell_size, y + half_cell_size))
+                            .end(pt2(x + half_cell_size, y - half_cell_size))
+                            .color(line_color)
+                            .weight(weight);
+                    }
+                    Border::Bottom => {
+                        draw.line()
+                            .start(pt2(x + half_cell_size, y - half_cell_size))
+                            .end(pt2(x - half_cell_size, y - half_cell_size))
+                            .color(line_color)
+                            .weight(weight);
+                    }
+                    Border::Left => {
+                        draw.line()
+                            .start(pt2(x - half_cell_size, y - half_cell_size))
+                            .end(pt2(x - half_cell_size, y + half_cell_size))
+                            .color(line_color)
+                            .weight(weight);
+                    }
                 }
             }
         }
