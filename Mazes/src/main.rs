@@ -5,7 +5,7 @@ use nannou::{
 use structs::{Border, CellPosition, Direction, Maze};
 pub mod structs;
 
-const MAZE_DIM: usize = 100;
+const MAZE_DIM: usize = 80;
 const WINDOW_DIM: u32 = 1000;
 const PADDING: u32 = 10;
 
