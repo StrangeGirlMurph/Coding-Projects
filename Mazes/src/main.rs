@@ -5,7 +5,7 @@ use nannou::{
 use structs::{Border, CellPosition, Direction, Maze};
 pub mod structs;
 
-const MAZE_DIM: usize = 80;
+const MAZE_DIM: usize = 100;
 const WINDOW_DIM: u32 = 1000;
 const PADDING: u32 = 10;
 
@@ -24,19 +24,10 @@ fn main() {
 
 struct Model {
     maze: Maze,
+    stack: Vec<CellPosition>,
 }
 
-fn model(_app: &App) -> Model {
-    let mut maze = Maze::new_with_borders();
-    let start = CellPosition { x: 0, y: 0 };
-    let end = CellPosition {
-        x: MAZE_DIM as isize - 1,
-        y: MAZE_DIM as isize - 1,
-    };
-
-    let mut stack = vec![start];
-    maze.cell(&start).unwrap().toggle_visited();
-
+fn generate_maze(maze: &mut Maze, stack: &mut Vec<CellPosition>) {
     while stack.len() != 0 {
         let position = stack.pop().unwrap();
 
@@ -68,14 +59,31 @@ fn model(_app: &App) -> Model {
                 .remove_border(&direction.reverse().border());
         }
     }
+}
+
+fn model(_app: &App) -> Model {
+    let start = CellPosition { x: 0, y: 0 };
+    let end = CellPosition {
+        x: MAZE_DIM as isize - 1,
+        y: MAZE_DIM as isize - 1,
+    };
+
+    let mut maze = Maze::new_with_borders();
+    let mut stack = vec![start];
+
+    maze.cell(&start).unwrap().toggle_visited();
 
     maze.cell(&start).unwrap().remove_border(&Border::Top);
     maze.cell(&end).unwrap().remove_border(&Border::Bottom);
 
-    Model { maze }
+    generate_maze(&mut maze, &mut stack);
+
+    Model { maze, stack }
 }
 
-fn update(_app: &App, _model: &mut Model, _update: Update) {}
+fn update(_app: &App, model: &mut Model, _update: Update) {
+    //generate_maze(&mut model.maze, &mut model.stack);
+}
 
 fn view(app: &App, model: &Model, frame: Frame) {
     let background_color = hsl(0.0, 0.0, 0.02);
