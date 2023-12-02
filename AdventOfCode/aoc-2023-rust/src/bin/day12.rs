@@ -9,7 +9,7 @@ pub fn day12_part2(input: &str) -> usize {
 }
 
 fn main() {
-    let input = fs::read_to_string("input/2023/day1.txt").unwrap();
+    let input = fs::read_to_string("input/2023/day12.txt").unwrap();
     println!("Day 12, Part 1: {}", day12_part1(&input));
     println!("Day 12, Part 2: {}", day12_part2(&input));
 }

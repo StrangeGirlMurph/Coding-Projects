@@ -13,7 +13,7 @@ pub fn day{i}_part2(input: &str) -> usize {{
 }}
 
 fn main() {{
-    let input = fs::read_to_string("input/2023/day1.txt").unwrap();
+    let input = fs::read_to_string("input/2023/day{i}.txt").unwrap();
     println!("Day {i}, Part 1: {{}}", day{i}_part1(&input));
     println!("Day {i}, Part 2: {{}}", day{i}_part2(&input));
 }}
