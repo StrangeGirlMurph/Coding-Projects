@@ -7,7 +7,6 @@ pub fn day2_part1(input: &str) -> usize {
         .lines()
         .map(|game| {
             let split = game.split(": ").collect::<Vec<&str>>();
-
             (
                 split[0][5..].parse::<usize>().unwrap(),
                 split[1]
