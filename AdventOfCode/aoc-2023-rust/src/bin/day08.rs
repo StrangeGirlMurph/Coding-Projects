@@ -1,7 +1,6 @@
 use std::{collections::HashMap, fs};
 
 use itertools::Itertools;
-use rayon::iter::{IndexedParallelIterator, IntoParallelRefIterator, ParallelIterator};
 
 pub fn day8_part1(instructions: &Vec<char>, network: &Vec<(&str, &str, &str)>) -> usize {
     let mut steps = 0;
@@ -82,7 +81,7 @@ pub fn day8_part2(instructions: &Vec<char>, network: &Vec<(&str, &str, &str)>) -
         }
     }
 
-    node_cycles.iter().cloned().reduce(lcm).unwrap()
+    node_cycles.into_iter().reduce(lcm).unwrap()
 }
 
 fn main() {
