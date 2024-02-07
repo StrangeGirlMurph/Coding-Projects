@@ -3,7 +3,7 @@ use std::fs;
 use itertools::Itertools;
 use rayon::vec;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone)]
 enum Direction {
     North,
     South,
@@ -114,40 +114,48 @@ pub fn day10_part2(input: &str) -> usize {
         }
     }
 
-    let mut loop_positions = vec![current_position];
+    let mut pipe = vec![current_position];
     loop {
-        current_position = current_direction.move_to_index(current_position);
-        if current_position == (start_x, start_y) {
+        let next_position = current_direction.move_to_index(current_position);
+        if next_position == (start_x, start_y) {
             break;
-        } else {
-            loop_positions.push(current_position);
-            current_direction = char_to_directions(grid[current_position.1][current_position.0])
-                .into_iter()
-                .find(|d| *d != current_direction.opposite())
-                .unwrap();
         }
+
+        current_position = next_position;
+        pipe.push(current_position);
+        current_direction = char_to_directions(grid[current_position.1][current_position.0])
+            .into_iter()
+            .find(|d| *d != current_direction.opposite())
+            .unwrap();
     }
 
-    /* grid = grid
+    grid = grid
         .iter()
         .enumerate()
         .map(|(y, l)| {
             l.iter()
                 .enumerate()
-                .map(|(x, c)| {
-                    if loop_positions.contains(&(x, y)) {
-                        'L'
-                    } else {
-                        '.'
-                    }
-                })
+                .map(|(x, c)| if pipe.contains(&(x, y)) { *c } else { '.' })
                 .collect_vec()
         })
         .collect_vec();
 
-    println!("{:?}", grid.iter().map(|l| l.iter().join("")).join("\n")); */
+    let mut shortest_pipe = vec![(start_x, start_y)];
 
-    22
+    let mut count = 0;
+
+    for y in 0..grid.len() {
+        let mut inside = false;
+        for x in 0..grid[y].len() {
+            if ['-', 'J', 'L'].contains(&grid[y][x]) {
+                inside = !inside;
+            } else if grid[y][x] == '.' && inside {
+                count += 1;
+            }
+        }
+    }
+
+    count
 }
 
 fn main() {
