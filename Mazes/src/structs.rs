@@ -123,7 +123,7 @@ impl Cell {
         self.data &= !border.bit_representation();
     }
 
-    pub fn get_possibile_directions(&self) -> Vec<Direction> {
+    pub fn get_possible_directions(&self) -> Vec<Direction> {
         vec![
             Direction::Up,
             Direction::Right,
