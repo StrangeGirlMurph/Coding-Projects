@@ -26,7 +26,21 @@ fn main() {
 }
 
 fn find_puzzle_solutions(board: Board, counter: Arc<AtomicUsize>) -> usize {
-    if let Some((x, y)) = board.iter_coords().find(|(x, y)| board.is_empty(*x, *y)) {
+    if Piece::iter_all().all(|p| !board.has(p)) {
+        // Found a solution if no pieces are left
+        let count = counter.fetch_add(1, Ordering::Relaxed) + 1;
+        if count % 100 == 0 {
+            print!("\r{}", count);
+            io::stdout().flush().unwrap();
+        }
+        //board.display();
+        return 1;
+    } else {
+        let (x, y) = board
+            .iter_coords()
+            .find(|(x, y)| board.is_empty_at(*x, *y))
+            .unwrap();
+
         //println!("Filling position ({}, {})", x, y);
         //board.display();
 
@@ -40,19 +54,21 @@ fn find_puzzle_solutions(board: Board, counter: Arc<AtomicUsize>) -> usize {
             .map(|p| find_puzzle_solutions(board.place(x, y, p), counter.clone()))
             .sum::<usize>();
 
-        // These facts are always true: (<x,y) (x,<y) must be filled and (x,>y) must be empty
+        // It holds: (x,y) empty =>
+        // (<x,y) and (x,<y) must be filled
+        // (x,>y) must be empty
         if board.has(Piece::from_id(1)) {
             if x.min(y) != 0 && x.max(y) != BOARD_SIZE - 1 {
                 // The 1x1 piece cannot go on the edges
-                if !(board.is_empty(x + 1, y) && board.is_filled(x - 1, y + 1)) {
+                if !(board.is_empty_at(x + 1, y) && board.is_filled_at(x - 1, y + 1)) {
                     /* The 1x1 piece cannot go into a corner created by two larger pieces like this:
                        o o o
                        o 1 -
                        x
                     */
-                    if !(board.is_filled(x + 1, y)
-                        && board.is_filled(x - 1, y + 1)
-                        && board.is_filled(x + 1, y + 1))
+                    if !(board.is_filled_at(x + 1, y)
+                        && board.is_filled_at(x - 1, y + 1)
+                        && board.is_filled_at(x + 1, y + 1))
                     {
                         /* The 1x1 piece cannot go into a slot where it would be isolated like this:
                            o o o
@@ -69,13 +85,6 @@ fn find_puzzle_solutions(board: Board, counter: Arc<AtomicUsize>) -> usize {
         }
 
         return solutions;
-    } else {
-        let count = counter.fetch_add(1, Ordering::Relaxed) + 1;
-        print!("\r{}", count);
-        io::stdout().flush().unwrap();
-
-        //board.display();
-        return 1;
     }
 }
 
@@ -103,12 +112,12 @@ impl Board {
         self.pieces[id - 1] -= 1;
     }
 
-    fn is_empty(&self, x: usize, y: usize) -> bool {
+    fn is_empty_at(&self, x: usize, y: usize) -> bool {
         self.get(x, y).is_empty()
     }
 
-    fn is_filled(&self, x: usize, y: usize) -> bool {
-        !self.get(x, y).is_empty()
+    fn is_filled_at(&self, x: usize, y: usize) -> bool {
+        !self.is_empty_at(x, y)
     }
 
     fn get(&self, x: usize, y: usize) -> Piece {
@@ -193,6 +202,10 @@ struct Piece {
 impl Piece {
     fn from_id(id: u8) -> Self {
         Self { id }
+    }
+
+    fn iter_all() -> impl Iterator<Item = Piece> {
+        (1..=ORDER).map(Piece::from_id)
     }
 
     fn size(&self) -> u8 {
