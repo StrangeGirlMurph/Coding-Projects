@@ -1,3 +1,9 @@
+use std::io::{self, Write};
+use std::sync::{
+    Arc,
+    atomic::{AtomicUsize, Ordering},
+};
+
 use colored::{ColoredString, Colorize};
 use hsv::hsv_to_rgb;
 use rayon::prelude::*;
@@ -13,10 +19,13 @@ fn main() {
     }
 
     println!("Finding puzzle solutions...");
-    println!("{} solutions found.", find_puzzle_solutions(Board::new()));
+    let solution_counter = Arc::new(AtomicUsize::new(0));
+    println!("Number of solutions found:");
+    let total_solutions = find_puzzle_solutions(Board::new(), solution_counter.clone());
+    println!("In total there are {} solutions found.", total_solutions);
 }
 
-fn find_puzzle_solutions(board: Board) -> usize {
+fn find_puzzle_solutions(board: Board, counter: Arc<AtomicUsize>) -> usize {
     if let Some((x, y)) = board.iter_coords().find(|(x, y)| board.is_empty(*x, *y)) {
         //println!("Filling position ({}, {})", x, y);
         //board.display();
@@ -28,23 +37,43 @@ fn find_puzzle_solutions(board: Board) -> usize {
             .rev()
             .map(|id| Piece::from_id(id))
             .filter(|p| board.has(*p) && board.fits(x, y, *p))
-            .map(|p| find_puzzle_solutions(board.place(x, y, p)))
+            .map(|p| find_puzzle_solutions(board.place(x, y, p), counter.clone()))
             .sum::<usize>();
 
+        // These facts are always true: (<x,y) (x,<y) must be filled and (x,>y) must be empty
         if board.has(Piece::from_id(1)) {
             if x.min(y) != 0 && x.max(y) != BOARD_SIZE - 1 {
                 // The 1x1 piece cannot go on the edges
-                if !(board.is_empty(x + 1, y) && !board.is_empty(x - 1, y + 1)) {
-                    // The 1x1 piece cannot go into a corner created by two larger pieces
-                    // (<x,y) (x,<y) must be filled and (x,>y) must be empty
-                    solutions += find_puzzle_solutions(board.place(x, y, Piece::from_id(1)));
+                if !(board.is_empty(x + 1, y) && board.is_filled(x - 1, y + 1)) {
+                    /* The 1x1 piece cannot go into a corner created by two larger pieces like this:
+                       o o o
+                       o 1 -
+                       x
+                    */
+                    if !(board.is_filled(x + 1, y)
+                        && board.is_filled(x - 1, y + 1)
+                        && board.is_filled(x + 1, y + 1))
+                    {
+                        /* The 1x1 piece cannot go into a slot where it would be isolated like this:
+                           o o o
+                           o 1 x
+                           x   x
+                        */
+                        solutions += find_puzzle_solutions(
+                            board.place(x, y, Piece::from_id(1)),
+                            counter.clone(),
+                        );
+                    }
                 }
             }
         }
 
         return solutions;
     } else {
-        println!("Found a solution!");
+        let count = counter.fetch_add(1, Ordering::Relaxed) + 1;
+        print!("\r{}", count);
+        io::stdout().flush().unwrap();
+
         //board.display();
         return 1;
     }
@@ -76,6 +105,10 @@ impl Board {
 
     fn is_empty(&self, x: usize, y: usize) -> bool {
         self.get(x, y).is_empty()
+    }
+
+    fn is_filled(&self, x: usize, y: usize) -> bool {
+        !self.get(x, y).is_empty()
     }
 
     fn get(&self, x: usize, y: usize) -> Piece {
