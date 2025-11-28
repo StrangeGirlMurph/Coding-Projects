@@ -1,8 +1,5 @@
 {
     "tasks": {
         "setup": "deno run -A --env-file setup.ts"
-    },
-    "imports": {
-        "@rdsq/open": "jsr:@rdsq/open@^1.0.1"
     }
 }

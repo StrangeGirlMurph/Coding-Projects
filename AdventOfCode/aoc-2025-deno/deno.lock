@@ -1,16 +1,3 @@
 {
-  "version": "5",
-  "specifiers": {
-    "jsr:@rdsq/open@^1.0.1": "1.0.1"
-  },
-  "jsr": {
-    "@rdsq/open@1.0.1": {
-      "integrity": "48983722b08e7d6c313561536b1112edeeb1023d1cc31e1b3eedb1de026fcea7"
-    }
-  },
-  "workspace": {
-    "dependencies": [
-      "jsr:@rdsq/open@^1.0.1"
-    ]
-  }
+  "version": "5"
 }
