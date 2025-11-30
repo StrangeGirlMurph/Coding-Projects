@@ -1,5 +1,8 @@
 {
     "tasks": {
         "setup": "deno run -A --env-file setup.ts"
+    },
+    "imports": {
+        "@std/collections": "jsr:@std/collections@^1.1.3"
     }
 }
