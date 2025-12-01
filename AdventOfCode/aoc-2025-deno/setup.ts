@@ -1,8 +1,8 @@
 const day = (Deno.readDirSync(".").filter(v => v.name.startsWith("day") && v.name.endsWith("ts")).map(v => parseInt(v.name.slice(3,5))).toArray().sort().at(-1) || 0) + 1
 
-new Deno.Command("xdg-open", {args: [`https://adventofcode.com/2024/day/${day}`]}).output()
+new Deno.Command("xdg-open", {args: [`https://adventofcode.com/2025/day/${day}`]}).output()
 
-const response = await fetch(`https://adventofcode.com/2024/day/${day}/input`, {
+const response = await fetch(`https://adventofcode.com/2025/day/${day}/input`, {
     headers: {
         Cookie: `session=${Deno.env.get("SESSION_COOKIE")}`,
     },
