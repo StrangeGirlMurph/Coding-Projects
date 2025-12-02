@@ -29,3 +29,4 @@ for (const range of input) {
 }
 
 console.log(sum)
+

@@ -16,5 +16,5 @@ if (response.body) {
 }
 
 Deno.writeTextFileSync(path + ".ts", 
-`const input = Deno.readTextFileSync("${path}.txt")
+`const input = Deno.readTextFileSync("${path}.txt").trim()
 `)
