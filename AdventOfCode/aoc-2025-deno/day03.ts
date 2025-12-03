@@ -14,15 +14,13 @@ console.log(total)
 total = 0
 
 for (const bank of input)  {
-    let digits: number[] = [];
     let lastpos = -1;
     for (let i = 1; i <= 12; i++) {
         const slice = bank.slice(lastpos + 1, i == 12 ? undefined : -(12-i))
         const next = Math.max(...slice)
         lastpos = lastpos + 1 + slice.findIndex(v => v == next)
-        digits = digits.concat(next)
+        total += next * Math.pow(10,12-i)
     }
-    total += digits.reduce((p,c,i) => p + c * Math.pow(10,12-(i+1)), 0)
 }
 
 console.log(total)
