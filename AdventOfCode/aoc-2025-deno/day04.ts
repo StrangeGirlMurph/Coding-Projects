@@ -66,7 +66,7 @@ while (true) {
     }
 
     if (accessible.length == 0) break
-
+    
     total += accessible.length
 
     for (const e of accessible) {
