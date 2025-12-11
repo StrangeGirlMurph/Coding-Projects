@@ -1,4 +1,4 @@
-const day = (Deno.readDirSync(".").filter(v => v.name.startsWith("day") && v.name.endsWith("ts")).map(v => parseInt(v.name.slice(3,5))).toArray().sort().at(-1) || 0) + 1
+const day = (Deno.readDirSync(".").filter(v => v.name.startsWith("day") && v.name.endsWith("ts")).map(v => parseInt(v.name.slice(3,5))).toArray().sort((a,b) => a - b).at(-1) || 0) + 1
 
 new Deno.Command("xdg-open", {args: [`https://adventofcode.com/2025/day/${day}`]}).output()
 
@@ -16,5 +16,5 @@ if (response.body) {
 }
 
 Deno.writeTextFileSync(path + ".ts", 
-`const input = Deno.readTextFileSync("${path}.txt").trim()
+`const input = Deno.readTextFileSync("${path}.txt").trim().split("\\n")
 `)
