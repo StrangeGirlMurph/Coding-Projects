@@ -8,6 +8,7 @@ use bevy::input::common_conditions::input_toggle_active;
 use bevy::prelude::*;
 use bevy::window::{Monitor, WindowResolution};
 use helpers::get_inputs;
+use rayon::prelude::*;
 
 fn main() {
     let (w, h) = get_inputs();
@@ -23,8 +24,8 @@ fn main() {
             alive_cells: 0,
             dead_cells: 0,
         })
-        .insert_resource(Time::<Fixed>::from_seconds(0.2))
-        .add_plugins(DefaultPlugins.set(WindowPlugin {
+        .insert_resource(Time::<Fixed>::from_seconds(0.15))
+        .add_plugins((DefaultPlugins.set(WindowPlugin {
             primary_window: Some(bevy::prelude::Window {
                 title: "Cellular Automata".into(),
                 visible: false,
@@ -34,7 +35,7 @@ fn main() {
                 ..default()
             }),
             ..default()
-        }))
+        }),))
         .add_systems(Startup, setup)
         .add_systems(
             FixedUpdate,
@@ -78,40 +79,46 @@ fn loooop(
     mut stats: ResMut<Stats>,
     window: Res<Window>,
     cells: Query<Entity, With<CellMarker>>,
+    par_commands: ParallelCommands,
 ) {
-    for entity in &cells {
-        commands.entity(entity).despawn();
-    }
+    cells.par_iter().for_each(|entity| {
+        par_commands.command_scope(|mut commands| {
+            commands.entity(entity).despawn();
+        });
+    });
 
     let color = Color::hsl(0.0, 0.0, 1.0);
     let mesh = meshes.add(Rectangle::new(grid.size, grid.size));
     let material = materials.add(color);
 
     stats.step += 1;
-    let mut dead_cells = 0;
 
     game_of_life_step(&mut grid);
-    for (i, cell) in grid.iter().enumerate() {
-        let alive = cell;
-        if !alive {
-            dead_cells += 1;
-            continue;
-        }
+    let alive_cells: Vec<(Mesh2d, MeshMaterial2d<ColorMaterial>, Transform, CellMarker)> = grid
+        .par_iter()
+        .enumerate()
+        .filter_map(|(i, alive)| {
+            if !alive {
+                return None;
+            }
 
-        let (x, y) = grid.index_to_xy(i);
-        let x = x as f32 * grid.size - window.width as f32 / 2.0;
-        let y = y as f32 * grid.size - window.height as f32 / 2.0;
+            let (x, y) = grid.index_to_xy(i);
+            let x = x as f32 * grid.size - window.width as f32 / 2.0;
+            let y = y as f32 * grid.size - window.height as f32 / 2.0;
 
-        commands.spawn((
-            Mesh2d(mesh.clone()),
-            MeshMaterial2d(material.clone()),
-            Transform::from_xyz(x + grid.size / 2.0, y + grid.size / 2.0, 0.0),
-            CellMarker,
-        ));
-    }
+            Some((
+                Mesh2d(mesh.clone()),
+                MeshMaterial2d(material.clone()),
+                Transform::from_xyz(x + grid.size / 2.0, y + grid.size / 2.0, 0.0),
+                CellMarker,
+            ))
+        })
+        .collect();
 
-    stats.dead_cells = dead_cells;
-    stats.alive_cells = grid.width * grid.height - dead_cells
+    stats.alive_cells = alive_cells.len();
+    stats.dead_cells = grid.width * grid.height - stats.alive_cells;
+
+    commands.spawn_batch(alive_cells);
 }
 
 #[derive(Resource)]
