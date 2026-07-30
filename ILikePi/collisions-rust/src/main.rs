@@ -1,3 +1,5 @@
+// https://www.youtube.com/shorts/P11ykXwx4-k
+
 struct Particle {
     pos: f64,
     vel: f64,
@@ -31,14 +33,13 @@ fn calculate(mut big: Particle, mut small: Particle, mut number_of_collisions: u
             small.pos = (small.pos - big.pos) / (big.vel - small.vel) * small.vel + small.pos;
             big.pos = small.pos;
             particle_collision(&mut big, &mut small);
-            number_of_collisions += 1;
         } else {
             // Collision with wall
             small.pos = 0.0;
             big.pos = big.pos + big.vel * small.pos / -small.vel;
             wall_collision(&mut small);
-            number_of_collisions += 1;
         }
+        number_of_collisions += 1;
         if number_of_collisions % 10u64.pow(DIGITS - 2) == 0 {
             println!("Update: {}", number_of_collisions);
         }
